@@ -12,7 +12,7 @@ class HomeWrapper extends StatelessWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: Text("NP Time"),
+          title: Text("Npolynomial Time"),
           bottom: _buildTabBar(context),
           actions: _buildAppBarActions(context),
         ),
