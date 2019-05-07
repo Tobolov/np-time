@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:np_time/db/database.dart';
 
-import '../../db/database.dart';
+import './tasks_bloc.dart';
 import '../../models/task.dart';
 import '../../models/subtask.dart';
 import '../../models/logged_time.dart';
@@ -9,9 +9,10 @@ import '../../models/logged_time.dart';
 class TasksPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    
     return Center(
-      child: FutureBuilder<List<Task>>(
-        future: DBProvider.db.getAllTasks(),
+      child: StreamBuilder<List<Task>>(
+        stream: tasksBloc.tasks,
         builder: (BuildContext context, AsyncSnapshot<List<Task>> snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data.length == 0) {

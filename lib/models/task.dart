@@ -37,13 +37,13 @@ class Task {
     factory Task.fromMap(Map<String, dynamic> json) => new Task(
         id: json['id'],
         title: json['title'],
-        deleted: json['deleted'],
+        deleted: json['deleted'] != 0,
         description: json['description'],
         dueDate: DateTime.parse(json['dueDate']),
         repeatStartDate: DateTime.parse(json['repeatStartDate']),
         repeatCycle: json['repeatCycle'],
         notification: json['notification'].toString().split(','),
-        subtasks: new List<Subtask>.from(json['subtasks'].map((subtask) => Subtask.fromMap(subtask))),
+        subtasks: new List<Subtask>.from((json['subtasks'] ?? <Subtask>[]).map((subtask) => Subtask.fromMap(subtask))),
     );
 
     Map<String, dynamic> toMap() => {

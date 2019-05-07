@@ -46,6 +46,16 @@ class DBProvider {
     return _database;
   }
 
+  deleteDB() async {
+    if (_database != null) {
+      _database.close();
+    }
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    String path = join(documentsDirectory.path, 'NpTime.db');
+    await deleteDatabase(path);
+    _database = null;
+  }
+
   initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, 'NpTime.db');
@@ -53,7 +63,7 @@ class DBProvider {
         onCreate: (Database db, int version) async {
       await db.execute('''
           CREATE TABLE $tableTask (
-            $taskId INTEGER PRIMARY KEY AUTOINCREMENT,
+            $taskId INTEGER PRIMARY KEY,
             $taskTitle TEXT,
             $taskDeleted BIT,
             $taskDescription TEXT,
@@ -62,18 +72,22 @@ class DBProvider {
             $taskRepeatCycle TEXT,
             $taskNotification TEXT
           );
+          ''');
+          await db.execute('''
           CREATE TABLE $tableSubtask (
-            $subtaskId INTEGER AUTOINCREMENT,
-            $subtaskTaskId INTEGER
+            $subtaskId INTEGER,
+            $subtaskTaskId INTEGER,
             $subtaskName TEXT,
             $subtaskEstimatedTime INTEGER,
             PRIMARY KEY ($subtaskId, $subtaskTaskId),
             FOREIGN KEY ($subtaskTaskId) REFERENCES $tableTask($taskId) ON UPDATE CASCADE ON DELETE CASCADE
           );
+          ''');
+          await db.execute('''
           CREATE TABLE $tableLoggedtime (
-            $loggedtimeId INTEGER AUTOINCREMENT,
-            $loggedtimeSubtaskId INTEGER
-            $loggedtimeTaskId INTEGER
+            $loggedtimeId INTEGER,
+            $loggedtimeSubtaskId INTEGER,
+            $loggedtimeTaskId INTEGER,
             $loggedtimeDate TEXT,
             $loggedtimeTimeSpan INTEGER,
             PRIMARY KEY ($loggedtimeId, $loggedtimeSubtaskId, $loggedtimeTaskId),
@@ -90,16 +104,27 @@ class DBProvider {
   Future<int> insertTask(Task insertTask) async {
     final db = await database;
     Map<String, dynamic> newTask = insertTask.toMap();
-    List<Subtask> subtasks = newTask.remove('subtasks');
+    newTask.remove('subtasks');
+    List<Subtask> subtasks = insertTask.subtasks;
+    var newTaskId = await db.rawQuery("SELECT MAX($taskId)+1 as $taskId FROM $tableTask");
+    int id = newTaskId.first["id"];
+    newTask['id'] = id;
     int res = await db.insert('$tableTask', newTask);
 
+    int i = 0;
     for (Subtask subtask in subtasks) {
       Map<String, dynamic> subtaskMap = subtask.toMap();
+      subtaskMap['id'] = i++;
+      subtaskMap['taskId'] = id;
       List<LoggedTime> loggedTimes = subtaskMap.remove('loggedTimes');
       res += await db.insert('$tableSubtask', subtaskMap);
-
+      
+      int j = 0;
       for (LoggedTime loggedTime in loggedTimes) {
         Map<String, dynamic> loggedTimeMap = loggedTime.toMap();
+        loggedTimeMap['id'] = j++;
+        loggedTimeMap['subtaskId'] = i;
+        loggedTimeMap['taskId'] = id;
         res += await db.insert('$tableLoggedtime', loggedTimeMap);
       }
     }
@@ -135,7 +160,7 @@ class DBProvider {
     );
     if (res.isNotEmpty) {
       Map<String, dynamic> taskMap = res.first;
-      taskMap['subtasks'] = _fetchTaskComponenets(id);
+      taskMap['subtasks'] = await _fetchTaskComponenets(id);
       return Task.fromMap(taskMap);
     }
     return null;
@@ -144,13 +169,18 @@ class DBProvider {
   Future<List<Task>> getAllTasks() async {
     final db = await database;
     var res = await db.query('$tableTask');
-    List<Task> list = res.isNotEmpty
-        ? res.map((task) {
-            task['subtasks'] = _fetchTaskComponenets(task['id']);
-            Task.fromMap(task);
-          }).toList()
-        : [];
-    return list;
+
+    if (res.isNotEmpty) {
+      List<Task> list = [];
+      for (Map<String, dynamic> task in res) {
+        var taskTemp = Map<String, dynamic>.from(task);
+        taskTemp['subtasks'] = await _fetchTaskComponenets(task['id']);
+        list.add(Task.fromMap(taskTemp));
+      }
+      return list;
+    } else {
+      return <Task>[];
+    }
   }
 
   //todo. how to chain differences? e.g subtask deleted? subtask added?

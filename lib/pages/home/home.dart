@@ -6,6 +6,10 @@ import '../tasks/tasks.dart';
 import '../history/history.dart';
 import './home_search_delegate.dart';
 import './home_fab.dart';
+import '../tasks/tasks_bloc.dart';
+import '../../models/task.dart';
+import '../../models/subtask.dart';
+import '../../models/logged_time.dart';
 
 class HomeWrapper extends StatelessWidget {
   @override
@@ -59,6 +63,19 @@ class HomeWrapper extends StatelessWidget {
               onPressed: () {
                 //todo Fab interaction
                 print("-- todo create task --");
+
+                tasksBloc.add(
+                  Task(
+                    title: 'test',
+                    description: 'UwU',
+                    dueDate: DateTime.now(),
+                    notification: <String>['1m', '5m'],
+                    repeatCycle: '',
+                    repeatStartDate: DateTime.now(),
+                    deleted: false,
+                    subtasks: <Subtask>[],
+                  ),
+                );
               },
             ));
         }
