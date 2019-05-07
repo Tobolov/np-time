@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:np_time/db/database.dart';
 
 import './tasks_bloc.dart';
+import './task_widget.dart';
+import '../../theme.dart';
 import '../../models/task.dart';
 import '../../models/subtask.dart';
 import '../../models/logged_time.dart';
@@ -9,7 +11,6 @@ import '../../models/logged_time.dart';
 class TasksPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    
     return Center(
       child: StreamBuilder<List<Task>>(
         stream: tasksBloc.tasks,
@@ -23,14 +24,19 @@ class TasksPage extends StatelessWidget {
                 ),
               );
             } else {
-              return ListView.builder(
-                  itemCount: snapshot.data.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    Task task = snapshot.data[index];
-                    return ListTile(
-                      title: Text(task.title),
+              return ListView.separated(
+                itemCount: snapshot.data.length,
+                itemBuilder: (BuildContext context, int index) {
+                  Task task = snapshot.data[index];
+                  return TaskWidget(task);
+                },
+                separatorBuilder: (context, index) {
+                  return Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Divider(color: CustomTheme.textDisabled),
                     );
-                  });
+                },
+              );
             }
           } else {
             return Center(child: CircularProgressIndicator());

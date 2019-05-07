@@ -64,7 +64,7 @@ class HomeWrapper extends StatelessWidget {
                 //todo Fab interaction
                 print("-- todo create task --");
 
-                tasksBloc.add(
+                /*tasksBloc.add(
                   Task(
                     title: 'test',
                     description: 'UwU',
@@ -75,7 +75,9 @@ class HomeWrapper extends StatelessWidget {
                     deleted: false,
                     subtasks: <Subtask>[],
                   ),
-                );
+                );*/
+
+                Navigator.pushNamed(context, '/create');
               },
             ));
         }

@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:np_time/pages/task_mutation/task_mutation.dart';
 
 import './pages/home/home.dart';
 import './db/database.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  debugPaintSizeEnabled = false;
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    DBProvider.db.deleteDB();
+    DBProvider.db.deleteDB(); //todo REMOVE THIS
     return MaterialApp(
         //debugShowCheckedModeBanner: false,
         theme: ThemeData(
@@ -18,7 +23,8 @@ class MyApp extends StatelessWidget {
           backgroundColor: const Color(0xFF27272F),
         ),
         routes: {
-          '/': (BuildContext context) => HomeWrapper()
+          '/': (BuildContext context) => HomeWrapper(),
+          '/create': (BuildContext context) => TaskMutation()
         });
   }
 }
