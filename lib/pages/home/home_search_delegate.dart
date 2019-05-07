@@ -58,7 +58,8 @@ class CustomSearchDelegate extends SearchDelegate {
       children: <Widget>[
         Center(
           child: Text(
-            "UWU.",
+            "UWU.", //todo
+            //https://medium.com/flutterpub/implementing-search-in-flutter-17dc5aa72018
           ),
         )
       ],
