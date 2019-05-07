@@ -60,7 +60,7 @@ class DBProvider {
             $taskDueDate TEXT,
             $taskRepeatStartDate TEXT,
             $taskRepeatCycle TEXT,
-            $taskNotification TEXT' //list of string delemited by 
+            $taskNotification TEXT
           );
           CREATE TABLE $tableSubtask (
             $subtaskId INTEGER AUTOINCREMENT,
@@ -153,7 +153,7 @@ class DBProvider {
     return list;
   }
 
-  //todo. how to chain differences? e.g subtask deleted? subtask added? 
+  //todo. how to chain differences? e.g subtask deleted? subtask added?
   /*
   Future<int> updateTask(Task updatedTask) async {
     final db = await database;
