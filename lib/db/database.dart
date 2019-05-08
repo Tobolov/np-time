@@ -71,7 +71,7 @@ class DBProvider {
             $taskNotification TEXT
           );
           ''');
-          await db.execute('''
+      await db.execute('''
           CREATE TABLE $tableSubtask (
             $subtaskId INTEGER,
             $subtaskTaskId INTEGER,
@@ -81,7 +81,7 @@ class DBProvider {
             FOREIGN KEY ($subtaskTaskId) REFERENCES $tableTask($taskId) ON UPDATE CASCADE ON DELETE CASCADE
           );
           ''');
-          await db.execute('''
+      await db.execute('''
           CREATE TABLE $tableLoggedtime (
             $loggedtimeId INTEGER,
             $loggedtimeSubtaskId INTEGER,
@@ -116,7 +116,7 @@ class DBProvider {
       subtaskMap['taskId'] = id;
       List<LoggedTime> loggedTimes = subtaskMap.remove('loggedTimes');
       res += await db.insert('$tableSubtask', subtaskMap);
-      
+
       int j = 0;
       for (LoggedTime loggedTime in loggedTimes) {
         Map<String, dynamic> loggedTimeMap = loggedTime.toMap();

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:grec_minimal/grec_minimal.dart';
 import 'package:np_time/models/task.dart';
+import 'package:np_time/presentation/custom_icons_icons.dart';
 import 'package:np_time/theme.dart';
 import 'package:intl/intl.dart';
+import 'package:np_time/widgets/duration_selector.dart';
 
 class TaskMutation extends StatefulWidget {
   @override
@@ -12,7 +14,7 @@ class TaskMutation extends StatefulWidget {
 }
 
 class _TaskMutationState extends State<TaskMutation> {
-  final Task _task = Task.template;
+  final Task _task = Task.simple;
   var scaffold = GlobalKey<ScaffoldState>();
 
   static final weekdayMap = {
@@ -93,9 +95,39 @@ class _TaskMutationState extends State<TaskMutation> {
         _buildNotificationRow(context),
         _buildDivider(context),
         _buildRepeatRow(context),
+        _buildDivider(context),
+        _buildEstimatedTimeRow(context),
+        _buildDivider(context),
       ],
     );
   }
+
+//=======================================================================================
+//                                    Shared
+//=======================================================================================
+
+  TextStyle _buildTextStyle(BuildContext context) {
+    return TextStyle(
+      fontSize: 19,
+      fontFamily: 'RobotoCondensed',
+      fontWeight: FontWeight.w300,
+      color: CustomTheme.textPrimary,
+    );
+  }
+
+  Widget _buildDivider(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16),
+      child: Divider(
+        height: 1,
+        color: CustomTheme.textDisabled,
+      ),
+    );
+  }
+
+//=======================================================================================
+//                                    Description
+//=======================================================================================
 
   Widget _buildDescriptionRow(BuildContext context) {
     return Container(
@@ -120,6 +152,10 @@ class _TaskMutationState extends State<TaskMutation> {
       ),
     );
   }
+
+//=======================================================================================
+//                                    Due Date
+//=======================================================================================
 
   Widget _buildDueDateRow(BuildContext context) {
     return Container(
@@ -148,6 +184,24 @@ class _TaskMutationState extends State<TaskMutation> {
       ),
     );
   }
+
+  Future<Null> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+      context: context,
+      initialDate: _task.dueDate ?? DateTime.now().add(Duration(days: 1)),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != _task.dueDate) {
+      setState(() {
+        _task.dueDate = picked;
+      });
+    }
+  }
+
+//=======================================================================================
+//                                    Notification
+//=======================================================================================
 
   Widget _buildNotificationRow(BuildContext context) {
     return Container(
@@ -228,13 +282,18 @@ class _TaskMutationState extends State<TaskMutation> {
     return widgets;
   }
 
+//=======================================================================================
+//                                    Repeat
+//=======================================================================================
+
   Widget _buildRepeatRow(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Container(
-            margin: EdgeInsets.only(right: 16),
+            margin: EdgeInsets.only(top: 5, right: 16),
             child: Icon(Icons.repeat),
           ),
           Expanded(
@@ -274,7 +333,8 @@ class _TaskMutationState extends State<TaskMutation> {
         }
         break;
       case Frequency.MONTHLY:
-        String frequency = rRule.getInterval() == 1 ? '' : _stringifyNumber(rRule.getInterval());
+        String frequency =
+            rRule.getInterval() == 1 ? '' : _stringifyNumber(rRule.getInterval());
         if (rRule.getByday() != null) {
           String weekday = weekdayMap[rRule.getByday().getWeekday()[0].index];
           String weekdayNth = _stringifyNumber(rRule.getByday().getNth());
@@ -311,39 +371,6 @@ class _TaskMutationState extends State<TaskMutation> {
         break;
     }
     return '$number$postfix';
-  }
-
-  TextStyle _buildTextStyle(BuildContext context) {
-    return TextStyle(
-      fontSize: 19,
-      fontFamily: 'RobotoCondensed',
-      fontWeight: FontWeight.w300,
-      color: CustomTheme.textPrimary,
-    );
-  }
-
-  Widget _buildDivider(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16),
-      child: Divider(
-        height: 1,
-        color: CustomTheme.textDisabled,
-      ),
-    );
-  }
-
-  Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-      context: context,
-      initialDate: _task.dueDate ?? DateTime.now().add(Duration(days: 1)),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null && picked != _task.dueDate) {
-      setState(() {
-        _task.dueDate = picked;
-      });
-    }
   }
 
   Future<void> _selectRepeat(BuildContext context) async {
@@ -420,6 +447,63 @@ class _TaskMutationState extends State<TaskMutation> {
           ),
         ),
       ),
+    );
+  }
+
+//=======================================================================================
+//                                  Estimated Time
+//=======================================================================================
+  Widget _buildEstimatedTimeRow(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      child: Row(
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(right: 16),
+            child: Icon(CustomIcons.target),
+          ),
+          Expanded(
+            child: GestureDetector(
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 6),
+                child: Text(
+                  _task.durationString,
+                  style: _buildTextStyle(context),
+                ),
+              ),
+              onTap: () => _selectSimpleEstimatedTime(context),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _selectSimpleEstimatedTime(BuildContext context) async {
+    if (_task.subtasks[0].name != '__simple__') {
+      final snackBar = SnackBar(
+        content: Text('You can\'t set the estimated time of a task while subtasks exist.'),
+        duration: Duration(seconds: 4),
+        action: SnackBarAction(
+          label: 'DISMISS',
+          onPressed: () {},
+        ),
+      );
+      scaffold.currentState.showSnackBar(snackBar);
+      return;
+    }
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) => DurationSelector(
+            title: 'Estimated Time',
+            initalDuration: _task.duration,
+            onSelected: (Duration duration) {
+              setState(() {
+                _task.subtasks[0].estimatedTime = duration;
+              });
+            },
+          ),
     );
   }
 }

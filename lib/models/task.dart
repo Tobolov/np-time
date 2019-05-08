@@ -33,14 +33,19 @@ class Task {
     this.subtasks = const <Subtask>[],
   });
 
-  static Task get template => Task(
+  static Task get simple => Task(
         description: null,
         dueDate: null,
         notification: <Duration>[],
         rRule: null,
         title: null,
         deleted: false,
-        subtasks: <Subtask>[],
+        subtasks: <Subtask>[
+          Subtask(
+            name: '__simple__',
+            estimatedTime: Duration(seconds: 0),
+          )
+        ],
       );
 
   factory Task.fromMap(Map<String, dynamic> json) => new Task(
@@ -73,4 +78,32 @@ class Task {
         ).join(','),
         'subtasks': new List<dynamic>.from(subtasks.map((subtask) => subtask.toMap())),
       };
+
+  String get durationString => _durationString();
+  Duration get duration => _calculateDuration();
+
+  Duration _calculateDuration() {
+    if (subtasks[0].name == '__simple__') {
+      return subtasks[0].estimatedTime;
+    }
+
+    Duration totalDuration = Duration(seconds: 0);
+    for (Subtask subtask in subtasks) {
+      totalDuration += subtask.estimatedTime;
+    }
+    return totalDuration;
+  }
+
+  String _durationString() {
+    Duration totalDuration = _calculateDuration();
+
+    if (totalDuration < Duration(hours: 1)) {
+      return '${totalDuration.inMinutes} minutes';
+    }
+
+    int totalMinutes = totalDuration.inMinutes;
+    int displayMinutes = totalMinutes % 60;
+    int displayHours = totalMinutes ~/ 60;
+    return '$displayHours hours and $displayMinutes minutes';
+  }
 }

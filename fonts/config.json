@@ -1,0 +1,66 @@
+{
+  "name": "CustomIcons",
+  "css_prefix_text": "",
+  "css_use_suffix": false,
+  "hinting": true,
+  "units_per_em": 1000,
+  "ascent": 850,
+  "glyphs": [
+    {
+      "uid": "62044d17f75c72656f1757f13b752432",
+      "css": "notifications_none",
+      "code": 59392,
+      "src": "material"
+    },
+    {
+      "uid": "a0d0ae1c602b86645f14c357cd8c6574",
+      "css": "subdirectory_arrow_right",
+      "code": 59393,
+      "src": "material"
+    },
+    {
+      "uid": "ogmm8kz4f7y6ji50gzajnwed8h6ck2u7",
+      "css": "chart-bar",
+      "code": 59394,
+      "src": "modernpics"
+    },
+    {
+      "uid": "2de52a661fda0ed6ae4d3232c1b2c62f",
+      "css": "timer",
+      "code": 59395,
+      "src": "material"
+    },
+    {
+      "uid": "830b6d2375dcc686ba61ed166e4166f7",
+      "css": "error",
+      "code": 59396,
+      "src": "material"
+    },
+    {
+      "uid": "db1d5199f54b1f1dea3a70f4f3ce768b",
+      "css": "warning",
+      "code": 59397,
+      "src": "material"
+    },
+    {
+      "uid": "cde79a37774e5817bc68fff2464aee28",
+      "css": "wrench",
+      "code": 59398,
+      "src": "elusive"
+    },
+    {
+      "uid": "03e38edb0dcca77f0db7d995f36bde29",
+      "css": "target",
+      "code": 59399,
+      "src": "custom_icons",
+      "selected": true,
+      "svg": {
+        "path": "M458.3 83.3V169.6C307.5 188.8 188.8 307.5 169.6 458.3H83.3V541.7H169.6C188.8 692.5 307.5 811.2 458.3 830.4V916.7H541.7V830.4C692.5 811.2 811.2 692.5 830.4 541.7H916.7V458.3H830.4C811.2 307.5 692.5 188.8 541.7 169.6V83.3M458.3 253.3V333.3H541.7V253.7C645.8 270.8 729.2 354.2 746.7 458.3H666.7V541.7H746.3C729.2 645.8 645.8 729.2 541.7 746.7V666.7H458.3V746.3C354.2 729.2 270.8 645.8 253.3 541.7H333.3V458.3H253.7C270.8 354.2 354.2 270.8 458.3 253.3M500 458.3A41.7 41.7 0 0 0 458.3 500 41.7 41.7 0 0 0 500 541.7 41.7 41.7 0 0 0 541.7 500 41.7 41.7 0 0 0 500 458.3Z",
+        "width": 1000
+      },
+      "search": [
+        "target"
+      ]
+    }
+  ]
+}

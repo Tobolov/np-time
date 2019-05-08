@@ -15,13 +15,13 @@ String subtaskToJson(Subtask data) => json.encode(data.toMap());
 class Subtask {
     int id;
     int taskId;
-    int name;
+    String name;
     Duration estimatedTime;
     List<LoggedTime> loggedTimes;
 
     Subtask({
         this.id,
-        @required this.taskId,
+        this.taskId,
         @required this.name,
         @required this.estimatedTime,
         this.loggedTimes = const <LoggedTime>[],
