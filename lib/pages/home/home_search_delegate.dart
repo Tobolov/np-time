@@ -49,7 +49,7 @@ class CustomSearchDelegate extends SearchDelegate {
 
   Widget _buildSearch(BuildContext context) {
     return TasksList(
-      noData: 'It\'s lonely here. \nHow about creating a new task!',
+      noData: 'No results.',
       searchFilter: query,
     );
   }
