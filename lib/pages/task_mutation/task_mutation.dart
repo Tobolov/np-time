@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:grec_minimal/grec_minimal.dart';
 import 'package:np_time/models/task.dart';
+import 'package:np_time/bloc/tasks_bloc.dart';
 import 'package:np_time/presentation/custom_icons_icons.dart';
 import 'package:np_time/theme.dart';
 import 'package:intl/intl.dart';
@@ -16,6 +17,8 @@ class TaskMutation extends StatefulWidget {
 class _TaskMutationState extends State<TaskMutation> {
   final Task _task = Task.simple;
   var scaffold = GlobalKey<ScaffoldState>();
+  final _formKey = GlobalKey<FormState>();
+  final _titleKey = GlobalKey<FormFieldState>();
 
   static final weekdayMap = {
     1: 'Monday',
@@ -36,20 +39,21 @@ class _TaskMutationState extends State<TaskMutation> {
         bottom: _buildTitleField(context),
         actions: _buildAppBarActions(context),
       ),
-      body: _buildBody(context),
+      body: Form(key: _formKey, child: _buildBody(context)),
     );
   }
 
   Widget _buildTitleField(BuildContext context) {
     return PreferredSize(
-        preferredSize: Size.fromHeight(50),
+        preferredSize: Size.fromHeight(35),
         child: Container(
           margin: EdgeInsets.only(
             left: 52,
-            bottom: 10,
+            bottom: 15,
           ),
           child: TextFormField(
-            initialValue: _task.title ?? 'Enter Title',
+            key: _titleKey,
+            initialValue: _task.title ?? '',
             style: TextStyle(
               fontSize: 25,
               fontFamily: 'RobotoCondensed',
@@ -57,7 +61,14 @@ class _TaskMutationState extends State<TaskMutation> {
             ),
             decoration: InputDecoration(
               border: InputBorder.none,
+              hintText: 'Enter title',
+              contentPadding: EdgeInsets.zero,
             ),
+            onSaved: (value) {
+              setState(() {
+               _task.title = value; 
+              });
+            },
           ),
         ));
   }
@@ -67,7 +78,7 @@ class _TaskMutationState extends State<TaskMutation> {
       Container(
         width: 65,
         alignment: Alignment.center,
-        margin: EdgeInsets.only(right: 16, top: 11),
+        margin: EdgeInsets.only(right: 8, top: 8, bottom: 8),
         child: RaisedButton(
           color: CustomTheme.secondaryLight,
           child: Text(
@@ -78,7 +89,38 @@ class _TaskMutationState extends State<TaskMutation> {
             ),
           ),
           onPressed: () {
-            //todo
+            if (_formKey.currentState.validate()) {
+              _formKey.currentState.save();
+              _titleKey.currentState.save();
+              if (_task.title.isEmpty) {
+                final snackBar = SnackBar(
+                  content: Text('Please enter a title.'),
+                  duration: Duration(seconds: 4),
+                  action: SnackBarAction(
+                    label: 'DISMISS',
+                    onPressed: () {},
+                  ),
+                );
+                scaffold.currentState.showSnackBar(snackBar);
+                return;
+              }
+
+              if (_task.dueDate == null) {
+                final snackBar = SnackBar(
+                  content: Text('Please set a due date.'),
+                  duration: Duration(seconds: 4),
+                  action: SnackBarAction(
+                    label: 'DISMISS',
+                    onPressed: () {},
+                  ),
+                );
+                scaffold.currentState.showSnackBar(snackBar);
+                return;
+              }
+
+              tasksBloc.add(_task);
+              Navigator.pop(context);
+            }
           },
         ),
       )
@@ -115,6 +157,15 @@ class _TaskMutationState extends State<TaskMutation> {
     );
   }
 
+  TextStyle _buildErrorTextStyle() {
+    return TextStyle(
+      fontSize: 12,
+      fontFamily: 'RobotoCondensed',
+      fontWeight: FontWeight.w300,
+      color: CustomTheme.errorColor,
+    );
+  }
+
   Widget _buildDivider(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16),
@@ -133,19 +184,30 @@ class _TaskMutationState extends State<TaskMutation> {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Container(
-            margin: EdgeInsets.only(right: 16),
+            margin: EdgeInsets.only(top: 6, right: 16),
             child: Icon(Icons.subject),
           ),
           Expanded(
             child: TextFormField(
-              initialValue: _task.description ?? 'Add Description',
+              initialValue: _task.description ?? '',
               style: _buildTextStyle(context),
+              minLines: 1,
+              maxLines: 6,
               decoration: InputDecoration(
+                hintText: 'Add description',
                 border: InputBorder.none,
+                helperStyle: _buildErrorTextStyle(),
+                errorStyle: _buildErrorTextStyle(),
                 contentPadding: EdgeInsets.symmetric(vertical: 6),
               ),
+              onSaved: (value) {
+                setState(() {
+                  _task.description = value ?? '';
+                });
+              },
             ),
           ),
         ],
@@ -482,7 +544,8 @@ class _TaskMutationState extends State<TaskMutation> {
   void _selectSimpleEstimatedTime(BuildContext context) async {
     if (_task.subtasks[0].name != '__simple__') {
       final snackBar = SnackBar(
-        content: Text('You can\'t set the estimated time of a task while subtasks exist.'),
+        content:
+            Text('You can\'t set the estimated time of a task while subtasks exist.'),
         duration: Duration(seconds: 4),
         action: SnackBarAction(
           label: 'DISMISS',

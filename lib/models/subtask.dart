@@ -40,6 +40,6 @@ class Subtask {
         'taskId': taskId,
         'name': name,
         'estimatedTime': estimatedTime.inSeconds,
-        'loggedTime': new List<dynamic>.from(loggedTimes.map((loggedTime) => loggedTime.toMap()))
+        'loggedTimes': new List<dynamic>.from(loggedTimes.map((loggedTime) => loggedTime.toMap()))
     };
 }

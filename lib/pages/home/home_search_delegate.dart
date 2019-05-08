@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:np_time/pages/tasks/task_list_widget.dart';
 
 import './home_bloc.dart';
+import 'package:np_time/bloc/tasks_bloc.dart';
 
 class CustomSearchDelegate extends SearchDelegate {
   @override
@@ -35,41 +37,20 @@ class CustomSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    if (query.length < 3) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Center(
-            child: Text(
-              "Search term must be longer than two letters.",
-            ),
-          )
-        ],
-      );
-    }
-
-    //Add the search term to the searchBloc.
-    //The Bloc will then handle the searching and add the results to the searchResults stream.
-    //This is the equivalent of submitting the search term to whatever search service you are using
-    homeBloc.addQuery(query);
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Center(
-          child: Text(
-            "UWU.", //todo
-            //https://medium.com/flutterpub/implementing-search-in-flutter-17dc5aa72018
-          ),
-        )
-      ],
-    );
+    return _buildSearch(context);
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
     // This method is called everytime the search term changes.
     // If you want to add search suggestions as the user enters their search term, this is the place to do that.
-    return Column();
+    return _buildSearch(context);
+  }
+
+  Widget _buildSearch(BuildContext context) {
+    return TasksList(
+      noData: 'It\'s lonely here. \nHow about creating a new task!',
+      searchFilter: query,
+    );
   }
 }

@@ -114,7 +114,8 @@ class DBProvider {
       Map<String, dynamic> subtaskMap = subtask.toMap();
       subtaskMap['id'] = i++;
       subtaskMap['taskId'] = id;
-      List<LoggedTime> loggedTimes = subtaskMap.remove('loggedTimes');
+      subtaskMap.remove('loggedTimes');
+      List<LoggedTime> loggedTimes = subtask.loggedTimes;
       res += await db.insert('$tableSubtask', subtaskMap);
 
       int j = 0;
@@ -137,7 +138,9 @@ class DBProvider {
       where: '$subtaskTaskId = ?',
       whereArgs: [id],
     );
-    return List<Map<String, dynamic>>.from(resSubtasks.map((subtask) async {
+    List<Map<String, dynamic>> subtasks = <Map<String, dynamic>>[];
+    for (Map<String, dynamic> lockedSubtask in resSubtasks) {
+      Map<String, dynamic> subtask = Map<String, dynamic>.from(lockedSubtask);
       var resLoggedTime = await db.query(
         '$tableLoggedtime',
         where: '$loggedtimeTaskId = ? AND $loggedtimeSubtaskId = ?',
@@ -145,8 +148,9 @@ class DBProvider {
       );
       subtask['loggedTimes'] =
           List<Map<String, dynamic>>.from(resLoggedTime.map((loggedTime) => loggedTime));
-      return subtask;
-    }));
+      subtasks.add(subtask);
+    }
+    return subtasks;
   }
 
   Future<Task> getTask(int id) async {

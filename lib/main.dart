@@ -10,10 +10,18 @@ void main() {
   runApp(MyApp());
 }
 
+bool get isInDebugMode {
+  bool inDebugMode = false;
+  assert(inDebugMode = true);
+  return inDebugMode;
+}
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    DBProvider.db.deleteDB(); //todo REMOVE THIS
+    if (isInDebugMode) {
+      DBProvider.db.deleteDB(); //todo REMOVE THIS
+    }
     return MaterialApp(
         //debugShowCheckedModeBanner: false,
         theme: ThemeData(

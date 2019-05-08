@@ -22,6 +22,10 @@ class Task {
   List<Duration> notification;
   List<Subtask> subtasks;
 
+  String get durationString => _durationString();
+  Duration get duration => _calculateDuration();
+  String get dueDateString => _dueDateString();
+
   Task({
     this.id,
     @required this.title,
@@ -54,11 +58,14 @@ class Task {
         deleted: json['deleted'] != 0,
         description: json['description'],
         dueDate: DateTime.parse(json['dueDate']),
-        rRule: GrecMinimal.fromTexts((<String>[json['rRule']]))[0],
+        rRule: json['rRule'].toString().length == 0
+            ? null
+            : GrecMinimal.fromTexts((<String>[json['rRule']]))[0],
         notification: List<Duration>.from(
           json['notification']
               .toString()
               .split(',')
+              .where((notification) => notification.isNotEmpty)
               .map((notification) => Duration(days: int.parse(notification))),
         ),
         subtasks: new List<Subtask>.from(
@@ -72,15 +79,12 @@ class Task {
         'deleted': deleted,
         'description': description,
         'dueDate': dueDate.toIso8601String(),
-        'rRule': rRule.asRuleText(),
+        'rRule': rRule?.asRuleText() ?? '',
         'notification': List<String>.from(
           notification.map((duration) => duration.inDays.toString()),
         ).join(','),
         'subtasks': new List<dynamic>.from(subtasks.map((subtask) => subtask.toMap())),
       };
-
-  String get durationString => _durationString();
-  Duration get duration => _calculateDuration();
 
   Duration _calculateDuration() {
     if (subtasks[0].name == '__simple__') {
@@ -105,5 +109,11 @@ class Task {
     int displayMinutes = totalMinutes % 60;
     int displayHours = totalMinutes ~/ 60;
     return '$displayHours hours and $displayMinutes minutes';
+  }
+
+  String _dueDateString() {
+    //todo make this a bit better
+    int daysRemaining = dueDate.difference(DateTime.now()).inDays;
+    return '$daysRemaining days remaining';
   }
 }

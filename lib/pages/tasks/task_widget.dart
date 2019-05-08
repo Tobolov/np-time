@@ -3,27 +3,41 @@ import 'package:np_time/models/task.dart';
 import '../../theme.dart';
 
 class TaskWidget extends StatelessWidget {
-  final Task task;
+  final Task _task;
 
-  TaskWidget(this.task);
+  TaskWidget(this._task);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Row(
-        children: <Widget>[
-          _buildPercentDisplay(context),
-          _buildInformativeInformation(context),
-          _buildAlertSector(context),
-        ],
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        child: Row(
+          children: <Widget>[
+            _buildPercentDisplay(context),
+            _buildInformativeInformation(context),
+            _buildAlertSector(context),
+          ],
+        ),
       ),
+      onTap: () {
+        final snackBar = SnackBar(
+          content: Text('Not yet implemented.'),
+          duration: Duration(seconds: 4),
+          action: SnackBarAction(
+            label: 'DISMISS',
+            onPressed: () {},
+          ),
+        );
+        Scaffold.of(context).showSnackBar(snackBar);
+      },
     );
   }
 
   Widget _buildPercentDisplay(BuildContext context) {
     return Container(
       alignment: Alignment.center,
-      margin: EdgeInsets.all(16),
+      margin: EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: <Widget>[
           Text(
@@ -35,13 +49,16 @@ class TaskWidget extends StatelessWidget {
               color: CustomTheme.textPrimary,
             ),
           ),
-          Text(
-            '%',
-            style: TextStyle(
-              fontSize: 35,
-              fontFamily: 'TitilliumWeb',
-              fontWeight: FontWeight.w200,
-              color: CustomTheme.textDisabled,
+          Container(
+            margin: EdgeInsets.only(bottom: 5),
+            child: Text(
+              '%',
+              style: TextStyle(
+                fontSize: 35,
+                fontFamily: 'TitilliumWeb',
+                fontWeight: FontWeight.w200,
+                color: CustomTheme.textDisabled,
+              ),
             ),
           )
         ],
@@ -53,12 +70,12 @@ class TaskWidget extends StatelessWidget {
     return Expanded(
       child: Container(
         alignment: Alignment.centerLeft,
-        margin: EdgeInsets.symmetric(vertical: 16),
+        margin: EdgeInsets.zero,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              task.title,
+              _task.title,
               style: TextStyle(
                 fontSize: 26,
                 fontFamily: 'RobotoCondensed',
@@ -67,7 +84,7 @@ class TaskWidget extends StatelessWidget {
               ),
             ),
             Text(
-              '2 days remaining',
+              _task.dueDateString,
               style: TextStyle(
                 fontSize: 12,
                 fontFamily: 'RobotoCondensed',
@@ -84,7 +101,7 @@ class TaskWidget extends StatelessWidget {
   Widget _buildAlertSector(BuildContext context) {
     return Container(
       alignment: Alignment.center,
-      margin: EdgeInsets.all(16),
+      margin: EdgeInsets.symmetric(horizontal: 16),
       child: Icon(
         Icons.warning,
         color: CustomTheme.accent,

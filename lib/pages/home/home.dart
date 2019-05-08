@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:np_time/pages/home/home_bloc.dart';
 
-import '../summary/summary.dart';
-import '../tasks/tasks.dart';
-import '../history/history.dart';
+import 'package:np_time/pages/summary/summary.dart';
+import 'package:np_time/pages/tasks/tasks.dart';
+import 'package:np_time/pages/history/history.dart';
 import './home_search_delegate.dart';
 import './home_fab.dart';
-import '../tasks/tasks_bloc.dart';
-import '../../models/task.dart';
-import '../../models/subtask.dart';
-import '../../models/logged_time.dart';
+import 'package:np_time/bloc/tasks_bloc.dart';
+import 'package:np_time/models/task.dart';
+import 'package:np_time/models/subtask.dart';
+import 'package:np_time/models/logged_time.dart';
 
 class HomeWrapper extends StatelessWidget {
   @override
