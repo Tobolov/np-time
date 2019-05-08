@@ -20,8 +20,7 @@ class DBProvider {
   final String taskDeleted = 'deleted';
   final String taskDescription = 'description';
   final String taskDueDate = 'dueDate';
-  final String taskRepeatStartDate = 'repeatStartDate';
-  final String taskRepeatCycle = 'repeatCycle';
+  final String taskRRule = 'rRule';
   final String taskNotification = 'notification';
 
   final String tableSubtask = 'Subtask';
@@ -68,8 +67,7 @@ class DBProvider {
             $taskDeleted BIT,
             $taskDescription TEXT,
             $taskDueDate TEXT,
-            $taskRepeatStartDate TEXT,
-            $taskRepeatCycle TEXT,
+            $taskRRule TEXT,
             $taskNotification TEXT
           );
           ''');

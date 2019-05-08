@@ -4,6 +4,7 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:grec_minimal/grec_minimal.dart';
 
 import './subtask.dart';
 
@@ -17,9 +18,8 @@ class Task {
   bool deleted;
   String description;
   DateTime dueDate;
-  DateTime repeatStartDate;
-  String repeatCycle;
-  List<String> notification;
+  RecurrenceRule rRule;
+  List<Duration> notification;
   List<Subtask> subtasks;
 
   Task({
@@ -28,8 +28,7 @@ class Task {
     this.deleted = false,
     @required this.description,
     @required this.dueDate,
-    @required this.repeatStartDate,
-    @required this.repeatCycle,
+    @required this.rRule,
     @required this.notification,
     this.subtasks = const <Subtask>[],
   });
@@ -37,9 +36,8 @@ class Task {
   static Task get template => Task(
         description: null,
         dueDate: null,
-        notification: null,
-        repeatCycle: null,
-        repeatStartDate: null,
+        notification: <Duration>[],
+        rRule: null,
         title: null,
         deleted: false,
         subtasks: <Subtask>[],
@@ -51,11 +49,16 @@ class Task {
         deleted: json['deleted'] != 0,
         description: json['description'],
         dueDate: DateTime.parse(json['dueDate']),
-        repeatStartDate: DateTime.parse(json['repeatStartDate']),
-        repeatCycle: json['repeatCycle'],
-        notification: json['notification'].toString().split(','),
+        rRule: GrecMinimal.fromTexts((<String>[json['rRule']]))[0],
+        notification: List<Duration>.from(
+          json['notification']
+              .toString()
+              .split(',')
+              .map((notification) => Duration(days: int.parse(notification))),
+        ),
         subtasks: new List<Subtask>.from(
-            (json['subtasks'] ?? <Subtask>[]).map((subtask) => Subtask.fromMap(subtask))),
+          (json['subtasks'] ?? <Subtask>[]).map((subtask) => Subtask.fromMap(subtask)),
+        ),
       );
 
   Map<String, dynamic> toMap() => {
@@ -64,9 +67,10 @@ class Task {
         'deleted': deleted,
         'description': description,
         'dueDate': dueDate.toIso8601String(),
-        'repeatStartDate': repeatStartDate.toIso8601String(),
-        'repeatCycle': repeatCycle,
-        'notification': notification.join(','),
+        'rRule': rRule.asRuleText(),
+        'notification': List<String>.from(
+          notification.map((duration) => duration.inDays.toString()),
+        ).join(','),
         'subtasks': new List<dynamic>.from(subtasks.map((subtask) => subtask.toMap())),
       };
 }

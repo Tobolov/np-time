@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grec_minimal/grec_minimal.dart';
 import 'package:np_time/models/task.dart';
 import 'package:np_time/theme.dart';
 import 'package:intl/intl.dart';
@@ -12,10 +13,23 @@ class TaskMutation extends StatefulWidget {
 
 class _TaskMutationState extends State<TaskMutation> {
   final Task _task = Task.template;
+  var scaffold = GlobalKey<ScaffoldState>();
+
+  static final weekdayMap = {
+    1: 'Monday',
+    2: 'Tuesday',
+    3: 'Wednesday',
+    4: 'Thursday',
+    5: 'Friday',
+    6: 'Saturday',
+    7: 'Sunday',
+    null: '???',
+  };
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffold,
       appBar: AppBar(
         bottom: _buildTitleField(context),
         actions: _buildAppBarActions(context),
@@ -75,18 +89,22 @@ class _TaskMutationState extends State<TaskMutation> {
         _buildDescriptionRow(context),
         _buildDivider(context),
         _buildDueDateRow(context),
+        _buildDivider(context),
+        _buildNotificationRow(context),
+        _buildDivider(context),
+        _buildRepeatRow(context),
       ],
     );
   }
 
   Widget _buildDescriptionRow(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(16),
+      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       child: Row(
         children: <Widget>[
           Container(
             margin: EdgeInsets.only(right: 16),
-            child: Icon(Icons.details),
+            child: Icon(Icons.subject),
           ),
           Expanded(
             child: TextFormField(
@@ -94,6 +112,7 @@ class _TaskMutationState extends State<TaskMutation> {
               style: _buildTextStyle(context),
               decoration: InputDecoration(
                 border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(vertical: 6),
               ),
             ),
           ),
@@ -104,20 +123,23 @@ class _TaskMutationState extends State<TaskMutation> {
 
   Widget _buildDueDateRow(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(16),
+      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       child: Row(
         children: <Widget>[
           Container(
             margin: EdgeInsets.only(right: 16),
-            child: Icon(Icons.calendar_view_day),
+            child: Icon(Icons.calendar_today),
           ),
           Expanded(
             child: GestureDetector(
-              child: Text(
-                _task.dueDate != null
-                    ? DateFormat('EEE, d MMM yyyy').format(_task.dueDate.toLocal())
-                    : 'Set due date',
-                style: _buildTextStyle(context),
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 6),
+                child: Text(
+                  _task.dueDate != null
+                      ? DateFormat('EEE, d MMM yyyy').format(_task.dueDate.toLocal())
+                      : 'Set due date',
+                  style: _buildTextStyle(context),
+                ),
               ),
               onTap: () => _selectDate(context),
             ),
@@ -125,6 +147,170 @@ class _TaskMutationState extends State<TaskMutation> {
         ],
       ),
     );
+  }
+
+  Widget _buildNotificationRow(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(right: 16),
+            child: Icon(Icons.notifications),
+          ),
+          Expanded(
+              child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ..._buildNotificationList(context),
+              GestureDetector(
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 0),
+                  child: Text(
+                    _task.notification.length == 0
+                        ? 'Add a notification'
+                        : 'Add another notification',
+                    style: TextStyle(
+                      fontSize: 19,
+                      fontFamily: 'RobotoCondensed',
+                      fontWeight: FontWeight.w300,
+                      color: _task.notification.length == 0
+                          ? CustomTheme.textPrimary
+                          : CustomTheme.textSecondary,
+                    ),
+                  ),
+                ),
+                onTap: () {
+                  setState(() {
+                    _task.notification.add(Duration(days: 1));
+                    //todo
+                  });
+                },
+              ),
+            ],
+          )),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildNotificationList(BuildContext context) {
+    List<Widget> widgets = <Widget>[];
+    _task.notification.asMap().forEach((index, notification) {
+      widgets.add(
+        Container(
+          margin: EdgeInsets.only(bottom: 16),
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  '${notification.inDays} Days',
+                  style: _buildTextStyle(context),
+                ),
+              ),
+              GestureDetector(
+                child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 16),
+                  child: Icon(Icons.close),
+                ),
+                onTap: () {
+                  setState(() {
+                    _task.notification.removeAt(index);
+                  });
+                },
+              )
+            ],
+          ),
+        ),
+      );
+    });
+    return widgets;
+  }
+
+  Widget _buildRepeatRow(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      child: Row(
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(right: 16),
+            child: Icon(Icons.repeat),
+          ),
+          Expanded(
+            child: GestureDetector(
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 6),
+                child: Text(
+                  _task.rRule != null ? _verbaliseRRule(_task.rRule) : 'Does not repeat',
+                  style: _buildTextStyle(context),
+                ),
+              ),
+              onTap: () => _selectRepeat(context),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _verbaliseRRule(RecurrenceRule rRule) {
+    String frequency = {
+      Frequency.DAILY: 'day',
+      Frequency.MONTHLY: 'month',
+      Frequency.WEEKLY: 'week',
+      Frequency.YEARLY: 'year',
+      null: ''
+    }[rRule.getFrequency()];
+
+    String repeatDay = weekdayMap[rRule.getByday()?.getWeekday()?.elementAt(0)?.index];
+
+    switch (rRule.getFrequency()) {
+      case Frequency.WEEKLY:
+        if (rRule.getInterval() == 1) {
+          return 'Repeats every week on $repeatDay';
+        } else {
+          return 'Repeats every ${_stringifyNumber(rRule.getInterval())} week on $repeatDay';
+        }
+        break;
+      case Frequency.MONTHLY:
+        String frequency = rRule.getInterval() == 1 ? '' : _stringifyNumber(rRule.getInterval());
+        if (rRule.getByday() != null) {
+          String weekday = weekdayMap[rRule.getByday().getWeekday()[0].index];
+          String weekdayNth = _stringifyNumber(rRule.getByday().getNth());
+          return 'Repeats every $frequency month on the $weekdayNth $weekday';
+        } else {
+          return 'Repeats every $frequency month on the ${_stringifyNumber(_task.dueDate.day)}';
+        }
+        break;
+
+      default:
+        if (rRule.getInterval() == 1) {
+          return 'Repeats every $frequency';
+        } else {
+          return 'Repeats every ${_stringifyNumber(rRule.getInterval())} $frequency';
+        }
+        break;
+    }
+  }
+
+  String _stringifyNumber(int number) {
+    String postfix;
+    switch (number % 10) {
+      case 1:
+        postfix = 'st';
+        break;
+      case 2:
+        postfix = 'nd';
+        break;
+      case 3:
+        postfix = 'rd';
+        break;
+      default:
+        postfix = 'th';
+        break;
+    }
+    return '$number$postfix';
   }
 
   TextStyle _buildTextStyle(BuildContext context) {
@@ -158,5 +344,82 @@ class _TaskMutationState extends State<TaskMutation> {
         _task.dueDate = picked;
       });
     }
+  }
+
+  Future<void> _selectRepeat(BuildContext context) async {
+    if (_task.dueDate == null) {
+      final snackBar = SnackBar(
+        content: Text('Due date must be set before assigning repeat schedule.'),
+        duration: Duration(seconds: 4),
+        action: SnackBarAction(
+          label: 'SET DUE DATE',
+          onPressed: () => _selectDate(context),
+        ),
+      );
+      scaffold.currentState.showSnackBar(snackBar);
+      return;
+    }
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          contentPadding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(6)),
+          ),
+          children: <Widget>[
+            _buildRepeatOption(
+              title: 'Every day',
+              targetRule: RecurrenceRule(Frequency.DAILY, 365 * 100, null, 1, null),
+            ),
+            _buildRepeatOption(
+              title: 'Every week on ${weekdayMap[_task.dueDate.weekday - 1]}',
+              targetRule: RecurrenceRule(Frequency.WEEKLY, 365 * 100, null, 1,
+                  Byday(<Weekday>[Weekday.values[_task.dueDate.weekday - 1]], null)),
+            ),
+            _buildRepeatOption(
+              title:
+                  'Every month on the ${_stringifyNumber((_task.dueDate.day - 1) ~/ 7)} ${weekdayMap[_task.dueDate.weekday - 1]}',
+              targetRule: RecurrenceRule(
+                Frequency.MONTHLY,
+                365 * 100,
+                null,
+                1,
+                Byday(<Weekday>[Weekday.values[_task.dueDate.weekday - 1]],
+                    (_task.dueDate.day - 1) ~/ 7),
+              ),
+            ),
+            _buildRepeatOption(
+              title: 'Every month on the ${_stringifyNumber(_task.dueDate.day)}',
+              targetRule: RecurrenceRule(Frequency.MONTHLY, 365 * 100, null, 1, null),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildRepeatOption(
+      {@required String title, @required RecurrenceRule targetRule}) {
+    return SimpleDialogOption(
+      onPressed: () {
+        setState(() {
+          _task.rRule = targetRule;
+        });
+        Navigator.pop(context);
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 6),
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: 19,
+            fontFamily: 'RobotoCondensed',
+            fontWeight: FontWeight.w300,
+            color: CustomTheme.textPrimary,
+          ),
+        ),
+      ),
+    );
   }
 }
