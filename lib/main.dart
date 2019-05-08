@@ -20,7 +20,8 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark,
           accentColor: const Color(0xFF00838F),
           primaryColor: const Color(0xFF00838F),
-          backgroundColor: const Color(0xFF27272F),
+          backgroundColor: const Color(0xFF00838F),
+          scaffoldBackgroundColor: const Color(0xFF27272F),
         ),
         routes: {
           '/': (BuildContext context) => HomeWrapper(),

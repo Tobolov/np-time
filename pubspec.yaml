@@ -26,6 +26,8 @@ dependencies:
   rxdart: 0.22.0
   sqflite: any
   path_provider: any
+  intl: 0.15.8
+
 
 
 
