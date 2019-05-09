@@ -89,38 +89,36 @@ class _TaskMutationState extends State<TaskMutation> {
             ),
           ),
           onPressed: () {
-            if (_formKey.currentState.validate()) {
-              _formKey.currentState.save();
-              _titleKey.currentState.save();
-              if (_task.title.isEmpty) {
-                final snackBar = SnackBar(
-                  content: Text('Please enter a title.'),
-                  duration: Duration(seconds: 4),
-                  action: SnackBarAction(
-                    label: 'DISMISS',
-                    onPressed: () {},
-                  ),
-                );
-                scaffold.currentState.showSnackBar(snackBar);
-                return;
-              }
-
-              if (_task.dueDate == null) {
-                final snackBar = SnackBar(
-                  content: Text('Please set a due date.'),
-                  duration: Duration(seconds: 4),
-                  action: SnackBarAction(
-                    label: 'DISMISS',
-                    onPressed: () {},
-                  ),
-                );
-                scaffold.currentState.showSnackBar(snackBar);
-                return;
-              }
-
-              tasksBloc.add(_task);
-              Navigator.pop(context);
+            // validate all TextFormFields (subtask names)
+            if (!_formKey.currentState.validate()) {
+              return;
             }
+
+            _formKey.currentState.save();
+            _titleKey.currentState.save();
+
+            // validate the title
+            if (_task.title.isEmpty) {
+              _displaySnackbar(
+                title: 'Please set a title.',
+                actionButtonLabel: 'DISMISS',
+                onPressed: () {},
+              );
+              return;
+            }
+
+            // validate the due date
+            if (_task.dueDate == null) {
+              _displaySnackbar(
+                title: 'Please set a due date.',
+                actionButtonLabel: 'DISMISS',
+                onPressed: () {},
+              );
+              return;
+            }
+
+            tasksBloc.add(_task);
+            Navigator.pop(context);
           },
         ),
       )
@@ -174,6 +172,21 @@ class _TaskMutationState extends State<TaskMutation> {
         color: CustomTheme.textDisabled,
       ),
     );
+  }
+
+  void _displaySnackbar(
+      {@required String title,
+      @required String actionButtonLabel,
+      @required Function onPressed}) {
+    final snackBar = SnackBar(
+      content: Text(title),
+      duration: Duration(seconds: 4),
+      action: SnackBarAction(
+        label: actionButtonLabel,
+        onPressed: onPressed,
+      ),
+    );
+    scaffold.currentState.showSnackBar(snackBar);
   }
 
 //=======================================================================================
@@ -516,15 +529,11 @@ class _TaskMutationState extends State<TaskMutation> {
 
   Future<void> _selectRepeat(BuildContext context) async {
     if (_task.dueDate == null) {
-      final snackBar = SnackBar(
-        content: Text('Due date must be set before assigning repeat schedule.'),
-        duration: Duration(seconds: 4),
-        action: SnackBarAction(
-          label: 'SET DUE DATE',
-          onPressed: () => _selectDate(context),
-        ),
+      _displaySnackbar(
+        title: 'Due date must be set before assigning repeat schedule.',
+        actionButtonLabel: 'SET DUE DATE',
+        onPressed: () => _selectDate(context),
       );
-      scaffold.currentState.showSnackBar(snackBar);
       return;
     }
     await showDialog<void>(
@@ -608,7 +617,7 @@ class _TaskMutationState extends State<TaskMutation> {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 6),
                 child: Text(
-                  _task.durationString,
+                  _task.estimateDurationString,
                   style: _buildTextStyle(context),
                 ),
               ),
@@ -622,16 +631,11 @@ class _TaskMutationState extends State<TaskMutation> {
 
   void _selectSimpleEstimatedTime(BuildContext context) async {
     if (_task.subtasks[0].name != '__simple__') {
-      final snackBar = SnackBar(
-        content:
-            Text('You can\'t set the estimated time of a task while subtasks exist.'),
-        duration: Duration(seconds: 4),
-        action: SnackBarAction(
-          label: 'DISMISS',
-          onPressed: () {},
-        ),
+      _displaySnackbar(
+        title: 'You can\'t set the estimated time of a task while subtasks exist.',
+        actionButtonLabel: 'DISMISS',
+        onPressed: () {},
       );
-      scaffold.currentState.showSnackBar(snackBar);
       return;
     }
     showDialog<void>(
@@ -640,8 +644,8 @@ class _TaskMutationState extends State<TaskMutation> {
       builder: (BuildContext context) => DialSelector(
             title: 'Estimated Time',
             initalDialValues: <int>[
-              _task.duration.inMinutes ~/ 60,
-              _task.duration.inMinutes % 60,
+              _task.estimatedDuration.inMinutes ~/ 60,
+              _task.estimatedDuration.inMinutes % 60,
             ],
             onSelected: (List<int> dialValues) {
               setState(() {

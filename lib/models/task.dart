@@ -22,9 +22,10 @@ class Task {
   List<Duration> notification;
   List<Subtask> subtasks;
 
-  String get durationString => _durationString();
-  Duration get duration => _calculateDuration();
+  String get estimateDurationString => _estimatedDurationString();
+  Duration get estimatedDuration => _calculateEstimatedDuration();
   String get dueDateString => _dueDateString();
+  Duration get totalLoggedTime => _calculateTotalLoggedTime();
 
   Task({
     this.id,
@@ -86,11 +87,7 @@ class Task {
         'subtasks': new List<dynamic>.from(subtasks.map((subtask) => subtask.toMap())),
       };
 
-  Duration _calculateDuration() {
-    if (subtasks[0].name == '__simple__') {
-      return subtasks[0].estimatedTime;
-    }
-
+  Duration _calculateEstimatedDuration() {
     Duration totalDuration = Duration(seconds: 0);
     for (Subtask subtask in subtasks) {
       totalDuration += subtask.estimatedTime;
@@ -98,14 +95,22 @@ class Task {
     return totalDuration;
   }
 
-  String _durationString() {
-    Duration totalDuration = _calculateDuration();
+  Duration _calculateTotalLoggedTime() {
+    Duration totalDuration = Duration(seconds: 0);
+    for (Subtask subtask in subtasks) {
+      totalDuration += subtask.totalLoggedTime;
+    }
+    return totalDuration;
+  }
 
-    if (totalDuration < Duration(hours: 1)) {
-      return '${totalDuration.inMinutes} minutes';
+  String _estimatedDurationString() {
+    Duration totalEstimatedDuration = _calculateEstimatedDuration();
+
+    if (totalEstimatedDuration < Duration(hours: 1)) {
+      return '${totalEstimatedDuration.inMinutes} minutes';
     }
 
-    int totalMinutes = totalDuration.inMinutes;
+    int totalMinutes = totalEstimatedDuration.inMinutes;
     int displayMinutes = totalMinutes % 60;
     int displayHours = totalMinutes ~/ 60;
     return '$displayHours hours and $displayMinutes minutes';

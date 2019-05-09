@@ -19,6 +19,8 @@ class Subtask {
     Duration estimatedTime;
     List<LoggedTime> loggedTimes;
 
+    Duration get totalLoggedTime => _calculateTotalLoggedTime();
+
     Subtask({
         this.id,
         this.taskId,
@@ -42,4 +44,12 @@ class Subtask {
         'estimatedTime': estimatedTime.inSeconds,
         'loggedTimes': new List<dynamic>.from(loggedTimes.map((loggedTime) => loggedTime.toMap()))
     };
+
+    Duration _calculateTotalLoggedTime() {
+      Duration totalDuration = Duration.zero;
+      for (LoggedTime loggedTime in loggedTimes) {
+        totalDuration += loggedTime.timespan;
+      }
+      return totalDuration;
+    }
 }

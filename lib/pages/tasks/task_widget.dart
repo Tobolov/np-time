@@ -41,7 +41,7 @@ class TaskWidget extends StatelessWidget {
       child: Row(
         children: <Widget>[
           Text(
-            '35',
+            (_task.totalLoggedTime.inSeconds ~/ _task.estimatedDuration.inSeconds).toString(),
             style: TextStyle(
               fontSize: 35,
               fontFamily: 'RobotoCondensed',
