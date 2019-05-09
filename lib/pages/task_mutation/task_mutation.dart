@@ -5,7 +5,7 @@ import 'package:np_time/bloc/tasks_bloc.dart';
 import 'package:np_time/presentation/custom_icons_icons.dart';
 import 'package:np_time/theme.dart';
 import 'package:intl/intl.dart';
-import 'package:np_time/widgets/duration_selector.dart';
+import 'package:np_time/widgets/dial_selector.dart';
 
 class TaskMutation extends StatefulWidget {
   @override
@@ -66,7 +66,7 @@ class _TaskMutationState extends State<TaskMutation> {
             ),
             onSaved: (value) {
               setState(() {
-               _task.title = value; 
+                _task.title = value;
               });
             },
           ),
@@ -297,12 +297,7 @@ class _TaskMutationState extends State<TaskMutation> {
                     ),
                   ),
                 ),
-                onTap: () {
-                  setState(() {
-                    _task.notification.add(Duration(days: 1));
-                    //todo
-                  });
-                },
+                onTap: () => _selectNotification(context),
               ),
             ],
           )),
@@ -342,6 +337,90 @@ class _TaskMutationState extends State<TaskMutation> {
       );
     });
     return widgets;
+  }
+
+  Future<void> _selectNotification(BuildContext context) async {
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          contentPadding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(6)),
+          ),
+          children: <Widget>[
+            _buildNotificationOption(
+              title: '1 day before',
+              onPressed: () {
+                setState(() {
+                  _task.notification.add(Duration(days: 1));
+                });
+              },
+            ),
+            _buildNotificationOption(
+              title: '3 days before',
+              onPressed: () {
+                setState(() {
+                  _task.notification.add(Duration(days: 3));
+                });
+              },
+            ),
+            _buildNotificationOption(
+              title: '1 week before',
+              onPressed: () {
+                setState(() {
+                  _task.notification.add(Duration(days: 7));
+                });
+              },
+            ),
+            _buildNotificationOption(
+              title: 'Custom',
+              onPressed: () {
+                showDialog<void>(
+                  context: context,
+                  barrierDismissible: false, // user must tap button!
+                  builder: (BuildContext context) => DialSelector(
+                        title: 'Notification',
+                        initalDialValues: <int>[0, 0],
+                        onSelected: (List<int> dialValues) {
+                          setState(() {
+                            _task.notification.add(
+                              Duration(days: dialValues[0] * 7 + dialValues[1]),
+                            );
+                          });
+                        },
+                        dialMaxs: <int>[10, 7],
+                        dialTitles: <String>['Weeks', 'Days'],
+                      ),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildNotificationOption(
+      {@required String title, @required Function onPressed}) {
+    return SimpleDialogOption(
+      onPressed: () {
+        onPressed();
+        Navigator.pop(context);
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 6),
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: 19,
+            fontFamily: 'RobotoCondensed',
+            fontWeight: FontWeight.w300,
+            color: CustomTheme.textPrimary,
+          ),
+        ),
+      ),
+    );
   }
 
 //=======================================================================================
@@ -558,14 +637,22 @@ class _TaskMutationState extends State<TaskMutation> {
     showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) => DurationSelector(
+      builder: (BuildContext context) => DialSelector(
             title: 'Estimated Time',
-            initalDuration: _task.duration,
-            onSelected: (Duration duration) {
+            initalDialValues: <int>[
+              _task.duration.inMinutes ~/ 60,
+              _task.duration.inMinutes % 60,
+            ],
+            onSelected: (List<int> dialValues) {
               setState(() {
-                _task.subtasks[0].estimatedTime = duration;
+                _task.subtasks[0].estimatedTime = Duration(
+                  hours: dialValues[0],
+                  minutes: dialValues[1],
+                );
               });
             },
+            dialTitles: <String>['Hours', 'Minutes'],
+            dialMaxs: <int>[100, 60],
           ),
     );
   }

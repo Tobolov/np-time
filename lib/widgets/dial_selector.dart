@@ -3,32 +3,34 @@ import 'dart:math' as math;
 
 import '../theme.dart';
 
-class DurationSelector extends StatefulWidget {
+class DialSelector extends StatefulWidget {
   final String title;
-  final Function(Duration) onSelected;
-  final Duration initalDuration;
+  final List<String> dialTitles;
+  final List<int> initalDialValues;
+  final List<int> dialMaxs;
+  final Function(List<int>) onSelected;
 
-  DurationSelector({
+  DialSelector({
     @required this.title,
+    @required this.dialTitles,
+    @required this.initalDialValues,
+    @required this.dialMaxs,
     @required this.onSelected,
-    @required this.initalDuration
   });
 
   @override
   State<StatefulWidget> createState() {
-    return _DurationSelectorState();
+    return _DialSelectorState();
   }
 }
 
-class _DurationSelectorState extends State<DurationSelector> {
-  int hours;
-  int minutes;
+class _DialSelectorState extends State<DialSelector> {
+  List<int> dialValues;
 
   @override
   void initState() {
     super.initState();
-    hours = widget.initalDuration.inMinutes ~/ 60;
-    minutes = widget.initalDuration.inMinutes % 60;
+    dialValues = widget.initalDialValues;
   }
 
   @override
@@ -54,20 +56,22 @@ class _DurationSelectorState extends State<DurationSelector> {
   Widget _buildContext() {
     return Container(
       height: 250,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          _buildDial(
-            descriptor: 'Hours',
-            maxInt: 100,
-            initalValue: widget.initalDuration.inMinutes ~/ 60,
+      child: ListView.separated(
+        itemCount: widget.dialTitles.length,
+        itemBuilder: (BuildContext context, int index) {
+          return _buildDial(
+            descriptor: widget.dialTitles[index],
+            maxInt: widget.dialMaxs[index],
+            initalValue: widget.initalDialValues[index],
             onSnapped: (int number) {
               setState(() {
-                hours = number;
+                dialValues[index] = number;
               });
             },
-          ),
-          Container(
+          );
+        },
+        separatorBuilder: (BuildContext context, int index) {
+          return Container(
             margin: EdgeInsets.only(top: 17),
             child: Text(
               ':',
@@ -78,18 +82,8 @@ class _DurationSelectorState extends State<DurationSelector> {
                 fontWeight: FontWeight.w300,
               ),
             ),
-          ),
-          _buildDial(
-            descriptor: 'Minutes',
-            maxInt: 60,
-            initalValue: widget.initalDuration.inMinutes % 60,
-            onSnapped: (int number) {
-              setState(() {
-                minutes = number;
-              });
-            },
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -215,7 +209,7 @@ class _DurationSelectorState extends State<DurationSelector> {
       FlatButton(
         child: Text('OK', style: _buildActionTextStyle()),
         onPressed: () {
-          widget.onSelected(Duration(hours: hours, minutes: minutes));
+          widget.onSelected(dialValues);
           Navigator.of(context).pop();
         },
       ),
