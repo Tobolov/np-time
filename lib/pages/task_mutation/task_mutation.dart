@@ -97,23 +97,23 @@ class _TaskMutationState extends State<TaskMutation> {
             _formKey.currentState.save();
             _titleKey.currentState.save();
 
-            // validate the title
             if (_task.title.isEmpty) {
-              _displaySnackbar(
-                title: 'Please set a title.',
-                actionButtonLabel: 'DISMISS',
-                onPressed: () {},
-              );
+              _displaySnackbar(title: 'Please set a title.');
               return;
             }
 
-            // validate the due date
             if (_task.dueDate == null) {
-              _displaySnackbar(
-                title: 'Please set a due date.',
-                actionButtonLabel: 'DISMISS',
-                onPressed: () {},
-              );
+              _displaySnackbar(title: 'Please set a due date.');
+              return;
+            }
+
+            if (_task.estimatedDuration == null) {
+              _displaySnackbar(title: 'Please set an estimated duration.');
+              return;
+            }
+
+            if (_task.estimatedDuration == Duration.zero) {
+              _displaySnackbar(title: 'Estimated duration can\'t be zero.');
               return;
             }
 
@@ -176,14 +176,14 @@ class _TaskMutationState extends State<TaskMutation> {
 
   void _displaySnackbar(
       {@required String title,
-      @required String actionButtonLabel,
-      @required Function onPressed}) {
+      String actionButtonLabel = 'DISMISS',
+      Function onPressed}) {
     final snackBar = SnackBar(
       content: Text(title),
       duration: Duration(seconds: 4),
       action: SnackBarAction(
         label: actionButtonLabel,
-        onPressed: onPressed,
+        onPressed: onPressed ?? () {},
       ),
     );
     scaffold.currentState.showSnackBar(snackBar);
@@ -363,6 +363,14 @@ class _TaskMutationState extends State<TaskMutation> {
           ),
           children: <Widget>[
             _buildNotificationOption(
+              title: 'On date due',
+              onPressed: () {
+                setState(() {
+                  _task.notification.add(Duration(days: 0));
+                });
+              },
+            ),
+            _buildNotificationOption(
               title: '1 day before',
               onPressed: () {
                 setState(() {
@@ -393,7 +401,7 @@ class _TaskMutationState extends State<TaskMutation> {
                   context: context,
                   barrierDismissible: false, // user must tap button!
                   builder: (BuildContext context) => DialSelector(
-                        title: 'Notification',
+                        title: 'Notifications for due date',
                         initalDialValues: <int>[0, 0],
                         onSelected: (List<int> dialValues) {
                           setState(() {

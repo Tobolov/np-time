@@ -26,6 +26,7 @@ class Task {
   Duration get estimatedDuration => _calculateEstimatedDuration();
   String get dueDateString => _dueDateString();
   Duration get totalLoggedTime => _calculateTotalLoggedTime();
+  double get percentComplete => _calculatePercentComplete();
 
   Task({
     this.id,
@@ -120,5 +121,12 @@ class Task {
     //todo make this a bit better
     int daysRemaining = dueDate.difference(DateTime.now()).inDays;
     return '$daysRemaining days remaining';
+  }
+
+  double _calculatePercentComplete() {
+    Duration totalEstimatedDuration = _calculateEstimatedDuration();
+    Duration totalLoggedTime = _calculateTotalLoggedTime();
+
+    return totalLoggedTime.inSeconds / totalEstimatedDuration.inSeconds;
   }
 }
