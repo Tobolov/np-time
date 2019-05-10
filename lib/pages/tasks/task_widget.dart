@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:np_time/models/logged_time.dart';
+import 'package:np_time/models/subtask.dart';
 import 'package:np_time/models/task.dart';
 import '../../theme.dart';
 
@@ -99,12 +101,45 @@ class TaskWidget extends StatelessWidget {
   }
 
   Widget _buildAlertSector(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      margin: EdgeInsets.symmetric(horizontal: 16),
-      child: Icon(
-        Icons.warning,
-        color: CustomTheme.accent,
+    //todo set onTap handlers
+
+    // task is overdue
+    if (_task.dueDate.compareTo(DateTime.now()) < 0) {
+      _buildAlertButton(icon: Icons.error, color: CustomTheme.errorColor, onTap: () {});
+    }
+
+    // task due in 3 days
+    if (_task.dueDate.compareTo(DateTime.now().add(Duration(days: 3))) < 0) {
+      _buildAlertButton(icon: Icons.warning, color: CustomTheme.accent, onTap: () {});
+    }
+
+    //todo task stale
+    if (_task.subtasks.length >= 1) {
+      DateTime lastLoggedTime = DateTime.fromMillisecondsSinceEpoch(0);
+      for (Subtask subtask in _task.subtasks) {
+        for (LoggedTime loggedTime in subtask.loggedTimes) {
+          if (lastLoggedTime.compareTo(loggedTime.date) > 0)
+            lastLoggedTime = loggedTime.date;
+        }
+      }
+      if (lastLoggedTime.difference(DateTime.now()) > Duration(days: 3)) {
+        // task has not been worked on for 3 days.
+        _buildAlertButton(icon: Icons.warning, color: CustomTheme.accent, onTap: () {});
+      }
+    }
+  }
+
+  Widget _buildAlertButton(
+      {@required IconData icon, @required Color color, @required Function onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        alignment: Alignment.center,
+        margin: EdgeInsets.symmetric(horizontal: 16),
+        child: Icon(
+          icon,
+          color: color,
+        ),
       ),
     );
   }
