@@ -99,22 +99,22 @@ class _TaskMutationState extends State<TaskMutation> {
             _titleKey.currentState.save();
 
             if (_task.title.isEmpty) {
-              _displaySnackbar(title: 'Please set a title.');
+              _displaySnackbar(label: 'Please set a title.');
               return;
             }
 
             if (_task.dueDate == null) {
-              _displaySnackbar(title: 'Please set a due date.');
+              _displaySnackbar(label: 'Please set a due date.');
               return;
             }
 
             if (_task.estimatedDuration == null) {
-              _displaySnackbar(title: 'Please set an estimated duration.');
+              _displaySnackbar(label: 'Please set an estimated duration.');
               return;
             }
 
             if (_task.estimatedDuration == Duration.zero) {
-              _displaySnackbar(title: 'Estimated duration can\'t be zero.');
+              _displaySnackbar(label: 'Estimated duration can\'t be zero.');
               return;
             }
 
@@ -139,7 +139,7 @@ class _TaskMutationState extends State<TaskMutation> {
         _buildDivider(context),
         _buildEstimatedTimeRow(context),
         _buildDivider(context),
-        _buildSubtasksRow(context),
+        //_buildSubtasksRow(context),
       ],
     );
   }
@@ -177,11 +177,11 @@ class _TaskMutationState extends State<TaskMutation> {
   }
 
   void _displaySnackbar(
-      {@required String title,
+      {@required String label,
       String actionButtonLabel = 'DISMISS',
       Function onPressed}) {
     final snackBar = SnackBar(
-      content: Text(title),
+      content: Text(label),
       duration: Duration(seconds: 4),
       action: SnackBarAction(
         label: actionButtonLabel,
@@ -347,6 +347,15 @@ class _TaskMutationState extends State<TaskMutation> {
   List<Widget> _buildNotificationList(BuildContext context) {
     List<Widget> widgets = <Widget>[];
     _task.notification.asMap().forEach((index, notification) {
+      String notificaitonLabel;
+      if (notification.inDays == 0) {
+        notificaitonLabel = 'On due date';
+      } else if (notification.inDays == 1) {
+        notificaitonLabel = '1 day before due date';
+      } else {
+        notificaitonLabel = '${notification.inDays} days before due date';
+      }
+
       widgets.add(
         Container(
           margin: EdgeInsets.only(bottom: 16),
@@ -354,7 +363,7 @@ class _TaskMutationState extends State<TaskMutation> {
             children: <Widget>[
               Expanded(
                 child: Text(
-                  '${notification.inDays} Days',
+                  notificaitonLabel,
                   style: _buildTextStyle(context),
                 ),
               ),
@@ -380,7 +389,7 @@ class _TaskMutationState extends State<TaskMutation> {
   Future<void> _selectNotification(BuildContext context) async {
     await showDialog<void>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext context1) {
         return SimpleDialog(
           contentPadding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
@@ -391,7 +400,7 @@ class _TaskMutationState extends State<TaskMutation> {
               title: 'On date due',
               onPressed: () {
                 setState(() {
-                  _task.notification.add(Duration(days: 0));
+                  _taskAddNotification(Duration(days: 0));
                 });
               },
             ),
@@ -399,7 +408,7 @@ class _TaskMutationState extends State<TaskMutation> {
               title: '1 day before',
               onPressed: () {
                 setState(() {
-                  _task.notification.add(Duration(days: 1));
+                  _taskAddNotification(Duration(days: 1));
                 });
               },
             ),
@@ -407,7 +416,7 @@ class _TaskMutationState extends State<TaskMutation> {
               title: '3 days before',
               onPressed: () {
                 setState(() {
-                  _task.notification.add(Duration(days: 3));
+                  _taskAddNotification(Duration(days: 3));
                 });
               },
             ),
@@ -415,28 +424,30 @@ class _TaskMutationState extends State<TaskMutation> {
               title: '1 week before',
               onPressed: () {
                 setState(() {
-                  _task.notification.add(Duration(days: 7));
+                  _taskAddNotification(Duration(days: 7));
                 });
               },
             ),
             _buildNotificationOption(
               title: 'Custom',
-              onPressed: () {
-                showDialog<void>(
-                  context: context,
-                  barrierDismissible: false, // user must tap button!
-                  builder: (BuildContext context) => DialSelector(
-                        title: 'Notifications for due date',
-                        initalDialValues: <int>[0, 0],
-                        onSelected: (List<int> dialValues) {
-                          setState(() {
-                            _task.notification.add(
-                              Duration(days: dialValues[0] * 7 + dialValues[1]),
-                            );
-                          });
-                        },
-                        dialMaxs: <int>[10, 7],
-                        dialTitles: <String>['Weeks', 'Days'],
+              onPressed: () async {
+                //Navigator.pop(context);
+                Future(
+                  () => showDialog<void>(
+                        context: context1,
+                        builder: (BuildContext context2) => DialSelector(
+                              title: 'Notifications for due date',
+                              initalDialValues: <int>[0, 0],
+                              onSelected: (List<int> dialValues) {
+                                setState(() {
+                                  _taskAddNotification(
+                                    Duration(days: dialValues[0] * 7 + dialValues[1]),
+                                  );
+                                });
+                              },
+                              dialMaxs: <int>[10, 7],
+                              dialTitles: <String>['Weeks', 'Days'],
+                            ),
                       ),
                 );
               },
@@ -445,6 +456,17 @@ class _TaskMutationState extends State<TaskMutation> {
         );
       },
     );
+  }
+
+  void _taskAddNotification(Duration notificiation) {
+    for (Duration duration in _task.notification) {
+      if (notificiation.compareTo(duration) == 0) {
+        _displaySnackbar(label: 'This notification already exists.');
+        return;
+      }
+    }
+    _task.notification.add(notificiation);
+    _task.notification.sort();
   }
 
   Widget _buildNotificationOption(
@@ -563,7 +585,7 @@ class _TaskMutationState extends State<TaskMutation> {
   Future<void> _selectRepeat(BuildContext context) async {
     if (_task.dueDate == null) {
       _displaySnackbar(
-        title: 'Due date must be set before assigning repeat schedule.',
+        label: 'Due date must be set before assigning repeat schedule.',
         actionButtonLabel: 'SET DUE DATE',
         onPressed: () => _selectDate(context),
       );
@@ -679,7 +701,7 @@ class _TaskMutationState extends State<TaskMutation> {
   void _selectSimpleEstimatedTime(BuildContext context) async {
     if (_task.subtasks[0].name != '__simple__') {
       _displaySnackbar(
-        title: 'You can\'t set the estimated time of a task while subtasks exist.',
+        label: 'You can\'t set the estimated time of a task while subtasks exist.',
       );
       return;
     }
@@ -737,7 +759,8 @@ class _TaskMutationState extends State<TaskMutation> {
                           _task.subtasks[index].name = value ?? '';
                         });
                       },
-                      validator: (value) => value.isEmpty ? 'Subtask name can\'t be empty' : null,
+                      validator: (value) =>
+                          value.isEmpty ? 'Subtask name can\'t be empty' : null,
                     ),
                     _buildSubtaskEstimatedTime(context, index),
                   ],

@@ -56,34 +56,43 @@ class _DialSelectorState extends State<DialSelector> {
   Widget _buildContext() {
     return Container(
       height: 250,
-      child: ListView.separated(
-        itemCount: widget.dialTitles.length,
-        itemBuilder: (BuildContext context, int index) {
-          return _buildDial(
-            descriptor: widget.dialTitles[index],
-            maxInt: widget.dialMaxs[index],
-            initalValue: widget.initalDialValues[index],
-            onSnapped: (int number) {
-              setState(() {
-                dialValues[index] = number;
-              });
-            },
-          );
-        },
-        separatorBuilder: (BuildContext context, int index) {
-          return Container(
-            margin: EdgeInsets.only(top: 17),
-            child: Text(
-              ':',
-              style: TextStyle(
-                color: CustomTheme.textDisabled,
-                fontFamily: 'RobotoCondensed',
-                fontSize: 43,
-                fontWeight: FontWeight.w300,
-              ),
-            ),
-          );
-        },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: () {
+          List<Widget> widgets = [];
+          for (int index = 0; index < widget.dialMaxs.length; index++) {
+            // add dial
+            widgets.add(_buildDial(
+              descriptor: widget.dialTitles[index],
+              maxInt: widget.dialMaxs[index],
+              initalValue: widget.initalDialValues[index],
+              onSnapped: (int number) {
+                setState(() {
+                  dialValues[index] = number;
+                });
+              },
+            ));
+
+            // add ':' seperator between every dial
+            if (index < widget.dialMaxs.length - 1) {
+              widgets.add(
+                Container(
+                  margin: EdgeInsets.only(top: 17),
+                  child: Text(
+                    ':',
+                    style: TextStyle(
+                      color: CustomTheme.textDisabled,
+                      fontFamily: 'RobotoCondensed',
+                      fontSize: 43,
+                      fontWeight: FontWeight.w300,
+                    ),
+                  ),
+                ),
+              );
+            }
+          }
+          return widgets;
+        }(),
       ),
     );
   }
