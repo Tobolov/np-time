@@ -105,12 +105,12 @@ class TaskWidget extends StatelessWidget {
 
     // task is overdue
     if (_task.dueDate.compareTo(DateTime.now()) < 0) {
-      _buildAlertButton(icon: Icons.error, color: CustomTheme.errorColor, onTap: () {});
+      return _buildAlertButton(icon: Icons.error, color: CustomTheme.errorColor, onTap: () {});
     }
 
     // task due in 3 days
     if (_task.dueDate.compareTo(DateTime.now().add(Duration(days: 3))) < 0) {
-      _buildAlertButton(icon: Icons.warning, color: CustomTheme.accent, onTap: () {});
+      return _buildAlertButton(icon: Icons.warning, color: CustomTheme.accent, onTap: () {});
     }
 
     //todo task stale
@@ -124,9 +124,10 @@ class TaskWidget extends StatelessWidget {
       }
       if (lastLoggedTime.difference(DateTime.now()) > Duration(days: 3)) {
         // task has not been worked on for 3 days.
-        _buildAlertButton(icon: Icons.warning, color: CustomTheme.accent, onTap: () {});
+        return _buildAlertButton(icon: Icons.warning, color: CustomTheme.accent, onTap: () {});
       }
     }
+    return Container();
   }
 
   Widget _buildAlertButton(

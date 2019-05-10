@@ -711,7 +711,6 @@ class _TaskMutationState extends State<TaskMutation> {
   Widget _buildSubtasksList() {
     return ListView.builder(
       itemBuilder: (BuildContext context, int index) {
-        Subtask subtask = _task.subtasks[index];
         return Container(
           child: Row(
             children: <Widget>[
@@ -723,7 +722,23 @@ class _TaskMutationState extends State<TaskMutation> {
               Expanded(
                 child: Column(
                   children: <Widget>[
-                    Text(subtask.name, style: _buildTextStyle(context)),
+                    TextFormField(
+                      initialValue: _task.subtasks[index].name ?? '',
+                      style: _buildTextStyle(context),
+                      decoration: InputDecoration(
+                        hintText: 'Subtitle name',
+                        border: InputBorder.none,
+                        helperStyle: _buildErrorTextStyle(),
+                        errorStyle: _buildErrorTextStyle(),
+                        contentPadding: EdgeInsets.symmetric(vertical: 6),
+                      ),
+                      onSaved: (value) {
+                        setState(() {
+                          _task.subtasks[index].name = value ?? '';
+                        });
+                      },
+                      validator: (value) => value.isEmpty ? 'Subtask name can\'t be empty' : null,
+                    ),
                     _buildSubtaskEstimatedTime(context, index),
                   ],
                 ),
