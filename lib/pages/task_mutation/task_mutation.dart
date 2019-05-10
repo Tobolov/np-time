@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:grec_minimal/grec_minimal.dart';
+import 'package:np_time/models/subtask.dart';
 import 'package:np_time/models/task.dart';
 import 'package:np_time/bloc/tasks_bloc.dart';
 import 'package:np_time/presentation/custom_icons_icons.dart';
@@ -138,6 +139,7 @@ class _TaskMutationState extends State<TaskMutation> {
         _buildDivider(context),
         _buildEstimatedTimeRow(context),
         _buildDivider(context),
+        _buildSubtasksRow(context),
       ],
     );
   }
@@ -187,6 +189,29 @@ class _TaskMutationState extends State<TaskMutation> {
       ),
     );
     scaffold.currentState.showSnackBar(snackBar);
+  }
+
+  void _displayEstimatedTimeDialog(BuildContext context,
+      {Function(Duration) onSelected}) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) => DialSelector(
+            title: 'Estimated Time',
+            initalDialValues: <int>[
+              _task.estimatedDuration.inMinutes ~/ 60,
+              _task.estimatedDuration.inMinutes % 60,
+            ],
+            onSelected: (List<int> dialValues) => onSelected(
+                  Duration(
+                    hours: dialValues[0],
+                    minutes: dialValues[1],
+                  ),
+                ),
+            dialTitles: <String>['Hours', 'Minutes'],
+            dialMaxs: <int>[100, 60],
+          ),
+    );
   }
 
 //=======================================================================================
@@ -612,6 +637,20 @@ class _TaskMutationState extends State<TaskMutation> {
 //                                  Estimated Time
 //=======================================================================================
   Widget _buildEstimatedTimeRow(BuildContext context) {
+    String estimatedDurationLabel;
+
+    // display estimated duration directly if not simple task
+    if (_task.subtasks[0].name != '__simple__') {
+      estimatedDurationLabel = _task.estimatedDurationString();
+    } else {
+      // if task estimated duration not set
+      if (_task.estimatedDuration == Duration.zero) {
+        estimatedDurationLabel = 'Set estimated time';
+      } else {
+        estimatedDurationLabel = _task.estimatedDurationString();
+      }
+    }
+
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       child: Row(
@@ -625,7 +664,7 @@ class _TaskMutationState extends State<TaskMutation> {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 6),
                 child: Text(
-                  _task.estimateDurationString,
+                  estimatedDurationLabel,
                   style: _buildTextStyle(context),
                 ),
               ),
@@ -641,31 +680,101 @@ class _TaskMutationState extends State<TaskMutation> {
     if (_task.subtasks[0].name != '__simple__') {
       _displaySnackbar(
         title: 'You can\'t set the estimated time of a task while subtasks exist.',
-        actionButtonLabel: 'DISMISS',
-        onPressed: () {},
       );
       return;
     }
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) => DialSelector(
-            title: 'Estimated Time',
-            initalDialValues: <int>[
-              _task.estimatedDuration.inMinutes ~/ 60,
-              _task.estimatedDuration.inMinutes % 60,
-            ],
-            onSelected: (List<int> dialValues) {
-              setState(() {
-                _task.subtasks[0].estimatedTime = Duration(
-                  hours: dialValues[0],
-                  minutes: dialValues[1],
-                );
-              });
-            },
-            dialTitles: <String>['Hours', 'Minutes'],
-            dialMaxs: <int>[100, 60],
+    _displayEstimatedTimeDialog(context, onSelected: (Duration duration) {
+      setState(() => _task.subtasks[0].estimatedTime = duration);
+    });
+  }
+
+//=======================================================================================
+//                                    Subtasks
+//=======================================================================================
+
+  Widget _buildSubtasksRow(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(right: 16),
+            child: Icon(CustomIcons.subdirectory_arrow_right),
           ),
+          _buildSubtasksList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubtasksList() {
+    return ListView.builder(
+      itemBuilder: (BuildContext context, int index) {
+        Subtask subtask = _task.subtasks[index];
+        return Container(
+          child: Row(
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(right: 16),
+                width: 1,
+                color: CustomTheme.textDisabled,
+              ),
+              Expanded(
+                child: Column(
+                  children: <Widget>[
+                    Text(subtask.name, style: _buildTextStyle(context)),
+                    _buildSubtaskEstimatedTime(context, index),
+                  ],
+                ),
+              ),
+              GestureDetector(
+                child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 16),
+                  child: Icon(Icons.close),
+                ),
+                onTap: () {
+                  setState(() {
+                    _task.subtasks.removeAt(index);
+                  });
+                },
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSubtaskEstimatedTime(BuildContext context, int index) {
+    String estimatedDurationLabel;
+
+    if (_task.subtasks[index].estimatedTime == Duration.zero) {
+      estimatedDurationLabel = 'Set estimated time';
+    } else {
+      estimatedDurationLabel = _task.estimatedDurationString(subtaskIndex: index);
+    }
+
+    return GestureDetector(
+      onTap: () {
+        _displayEstimatedTimeDialog(context, onSelected: (Duration duration) {
+          setState(() => _task.subtasks[index].estimatedTime = duration);
+        });
+      },
+      child: Row(
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(right: 16),
+            child: Icon(CustomIcons.target),
+          ),
+          Expanded(
+            child: Text(
+              estimatedDurationLabel,
+              style: _buildTextStyle(context),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

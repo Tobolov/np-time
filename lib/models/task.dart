@@ -22,7 +22,6 @@ class Task {
   List<Duration> notification;
   List<Subtask> subtasks;
 
-  String get estimateDurationString => _estimatedDurationString();
   Duration get estimatedDuration => _calculateEstimatedDuration();
   String get dueDateString => _dueDateString();
   Duration get totalLoggedTime => _calculateTotalLoggedTime();
@@ -104,17 +103,15 @@ class Task {
     return totalDuration;
   }
 
-  String _estimatedDurationString() {
-    Duration totalEstimatedDuration = _calculateEstimatedDuration();
+  String estimatedDurationString({int subtaskIndex}) {
+    Duration totalEstimatedDuration;
 
-    if (totalEstimatedDuration < Duration(hours: 1)) {
-      return '${totalEstimatedDuration.inMinutes} minutes';
+    if (subtaskIndex == null) {
+      totalEstimatedDuration = _calculateEstimatedDuration();
+    } else {
+      totalEstimatedDuration = subtasks[subtaskIndex].estimatedTime;
     }
-
-    int totalMinutes = totalEstimatedDuration.inMinutes;
-    int displayMinutes = totalMinutes % 60;
-    int displayHours = totalMinutes ~/ 60;
-    return '$displayHours hours and $displayMinutes minutes';
+    return _generateEstimatedDurationString(totalEstimatedDuration);
   }
 
   String _dueDateString() {
@@ -128,5 +125,16 @@ class Task {
     Duration totalLoggedTime = _calculateTotalLoggedTime();
 
     return totalLoggedTime.inSeconds / totalEstimatedDuration.inSeconds;
+  }
+
+  String _generateEstimatedDurationString(Duration duration) {
+    if (duration < Duration(hours: 1)) {
+      return '${duration.inMinutes} minutes';
+    }
+
+    int totalMinutes = duration.inMinutes;
+    int displayMinutes = totalMinutes % 60;
+    int displayHours = totalMinutes ~/ 60;
+    return '$displayHours hours and $displayMinutes minutes';
   }
 }
