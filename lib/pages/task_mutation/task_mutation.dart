@@ -139,7 +139,7 @@ class _TaskMutationState extends State<TaskMutation> {
         _buildDivider(context),
         _buildEstimatedTimeRow(context),
         _buildDivider(context),
-        //_buildSubtasksRow(context),
+        _buildSubtasksRow(context),
       ],
     );
   }
@@ -148,12 +148,12 @@ class _TaskMutationState extends State<TaskMutation> {
 //                                    Shared
 //=======================================================================================
 
-  TextStyle _buildTextStyle(BuildContext context) {
+  TextStyle _buildTextStyle(BuildContext context, {Color color}) {
     return TextStyle(
       fontSize: 19,
       fontFamily: 'RobotoCondensed',
       fontWeight: FontWeight.w300,
-      color: CustomTheme.textPrimary,
+      color: color ?? CustomTheme.textPrimary,
     );
   }
 
@@ -192,15 +192,16 @@ class _TaskMutationState extends State<TaskMutation> {
   }
 
   void _displayEstimatedTimeDialog(BuildContext context,
-      {Function(Duration) onSelected}) {
+      {@required Function(Duration) onSelected,
+      Duration initalDuration = Duration.zero}) {
     showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) => DialSelector(
             title: 'Estimated Time',
             initalDialValues: <int>[
-              _task.estimatedDuration.inMinutes ~/ 60,
-              _task.estimatedDuration.inMinutes % 60,
+              initalDuration.inMinutes ~/ 60,
+              initalDuration.inMinutes % 60,
             ],
             onSelected: (List<int> dialValues) => onSelected(
                   Duration(
@@ -660,10 +661,12 @@ class _TaskMutationState extends State<TaskMutation> {
 //=======================================================================================
   Widget _buildEstimatedTimeRow(BuildContext context) {
     String estimatedDurationLabel;
+    Color estimatedDurationLabelColor = CustomTheme.textPrimary;
 
     // display estimated duration directly if not simple task
     if (_task.subtasks[0].name != '__simple__') {
       estimatedDurationLabel = _task.estimatedDurationString();
+      estimatedDurationLabelColor = CustomTheme.textDisabled;
     } else {
       // if task estimated duration not set
       if (_task.estimatedDuration == Duration.zero) {
@@ -687,7 +690,7 @@ class _TaskMutationState extends State<TaskMutation> {
                 padding: EdgeInsets.symmetric(vertical: 6),
                 child: Text(
                   estimatedDurationLabel,
-                  style: _buildTextStyle(context),
+                  style: _buildTextStyle(context, color: estimatedDurationLabelColor),
                 ),
               ),
               onTap: () => _selectSimpleEstimatedTime(context),
@@ -707,7 +710,7 @@ class _TaskMutationState extends State<TaskMutation> {
     }
     _displayEstimatedTimeDialog(context, onSelected: (Duration duration) {
       setState(() => _task.subtasks[0].estimatedTime = duration);
-    });
+    }, initalDuration: _task.estimatedDuration);
   }
 
 //=======================================================================================
@@ -724,63 +727,104 @@ class _TaskMutationState extends State<TaskMutation> {
             margin: EdgeInsets.only(right: 16),
             child: Icon(CustomIcons.subdirectory_arrow_right),
           ),
-          _buildSubtasksList(),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: _buildSubtasksList(),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSubtasksList() {
-    return ListView.builder(
-      itemBuilder: (BuildContext context, int index) {
-        return Container(
-          child: Row(
-            children: <Widget>[
-              Container(
-                margin: EdgeInsets.only(right: 16),
-                width: 1,
-                color: CustomTheme.textDisabled,
-              ),
-              Expanded(
-                child: Column(
-                  children: <Widget>[
-                    TextFormField(
-                      initialValue: _task.subtasks[index].name ?? '',
-                      style: _buildTextStyle(context),
-                      decoration: InputDecoration(
-                        hintText: 'Subtitle name',
-                        border: InputBorder.none,
-                        helperStyle: _buildErrorTextStyle(),
-                        errorStyle: _buildErrorTextStyle(),
-                        contentPadding: EdgeInsets.symmetric(vertical: 6),
+  List<Widget> _buildSubtasksList() {
+    List<Widget> widgets = [];
+
+    bool simpleTask = _task.subtasks[0].name == '__simple__';
+
+    if (!simpleTask) {
+      // add the subtasks
+      for (int index = 0; index < _task.subtasks.length; index++) {
+        widgets.add(
+          Container(
+            margin: EdgeInsets.only(bottom: 16),
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.only(right: 16),
+                    width: 1.5,
+                    color: CustomTheme.textDisabled,
+                  ),
+                  Expanded(child: _buildSubtaskCenterContent(index)),
+                  GestureDetector(
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 16),
+                        child: Icon(Icons.close),
                       ),
-                      onSaved: (value) {
-                        setState(() {
-                          _task.subtasks[index].name = value ?? '';
-                        });
-                      },
-                      validator: (value) =>
-                          value.isEmpty ? 'Subtask name can\'t be empty' : null,
-                    ),
-                    _buildSubtaskEstimatedTime(context, index),
-                  ],
-                ),
+                      onTap: () => setState(() => _task.removeSubtaskAt(index)))
+                ],
               ),
-              GestureDetector(
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 16),
-                  child: Icon(Icons.close),
-                ),
-                onTap: () {
-                  setState(() {
-                    _task.subtasks.removeAt(index);
-                  });
-                },
-              )
-            ],
+            ),
           ),
         );
-      },
+      }
+    }
+
+    // add the 'Add subtask' button
+    widgets.add(
+      GestureDetector(
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 0),
+          child: Text(
+            simpleTask ? 'Add a subtask' : 'Add another subtask',
+            style: TextStyle(
+              fontSize: 19,
+              fontFamily: 'RobotoCondensed',
+              fontWeight: FontWeight.w300,
+              color: simpleTask == 0
+                  ? CustomTheme.textPrimary
+                  : CustomTheme.textSecondary,
+            ),
+          ),
+        ),
+        onTap: () => setState(() => _task.addEmptySubtask()),
+      ),
+    );
+
+    return widgets;
+  }
+
+  Widget _buildSubtaskCenterContent(int index) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Container(
+          padding: EdgeInsets.only(bottom: 6),
+          child: TextFormField(
+            initialValue: _task.subtasks[index].name ?? '',
+            style: _buildTextStyle(context),
+            minLines: 1,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: 'Subtitle name',
+              border: InputBorder.none,
+              helperStyle: _buildErrorTextStyle(),
+              errorStyle: _buildErrorTextStyle(),
+              contentPadding: EdgeInsets.only(top: 6),
+            ),
+            onSaved: (value) {
+              setState(() {
+                _task.subtasks[index].name = value ?? '';
+              });
+            },
+            validator: (value) => value.isEmpty ? 'Subtask name can\'t be empty' : null,
+          ),
+        ),
+        _buildSubtaskEstimatedTime(context, index),
+      ],
     );
   }
 

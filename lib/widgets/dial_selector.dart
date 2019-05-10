@@ -30,7 +30,7 @@ class _DialSelectorState extends State<DialSelector> {
   @override
   void initState() {
     super.initState();
-    dialValues = widget.initalDialValues;
+    dialValues = List<int>.from(widget.initalDialValues);
   }
 
   @override

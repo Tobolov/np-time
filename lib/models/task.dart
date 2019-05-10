@@ -124,7 +124,9 @@ class Task {
     Duration totalEstimatedDuration = _calculateEstimatedDuration();
     Duration totalLoggedTime = _calculateTotalLoggedTime();
 
-    return totalLoggedTime.inSeconds / totalEstimatedDuration.inSeconds;
+    double percent = totalLoggedTime.inSeconds / totalEstimatedDuration.inSeconds;
+
+    return percent.isFinite ? percent : 0;
   }
 
   String _generateEstimatedDurationString(Duration duration) {
@@ -136,5 +138,29 @@ class Task {
     int displayMinutes = totalMinutes % 60;
     int displayHours = totalMinutes ~/ 60;
     return '$displayHours hours and $displayMinutes minutes';
+  }
+
+  void addEmptySubtask() {
+    if (subtasks[0].name == '__simple__') {
+      // if simple task, convert to complex
+      Duration duration = subtasks[0].estimatedTime;
+      subtasks.removeAt(0);
+      subtasks.add(Subtask.empty);
+
+      //retain previous estimated time
+      subtasks[0].estimatedTime = duration;
+
+    } else {
+      subtasks.add(Subtask.empty);    
+    }
+    
+  }
+
+  void removeSubtaskAt(int index) {
+    subtasks.removeAt(index);
+    if (subtasks.length == 0) {
+      subtasks.add(Subtask.empty);
+      subtasks[0].name = '__simple__';
+    }
   }
 }

@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isInDebugMode) {
-      DBProvider.db.deleteDB(); //todo REMOVE THIS
+      //DBProvider.db.deleteDB(); //todo REMOVE THIS
     }
     return MaterialApp(
         //debugShowCheckedModeBanner: false,
