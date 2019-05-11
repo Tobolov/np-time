@@ -7,13 +7,20 @@ import 'package:np_time/models/task.dart';
 
 class TasksBloc {
   final _tasks = BehaviorSubject<List<Task>>();
-  SortBy sortBy = SortBy.DueDate;
-  SortOrder sortOrder = SortOrder.Ascending;
+  final _sortBy = BehaviorSubject<SortBy>();
+  final _sortOrder = BehaviorSubject<SortOrder>();
 
   Observable<List<Task>> get tasks => _tasks.stream;
+  Observable<SortBy> get sortBy => _sortBy.stream;
+  Observable<SortOrder> get sortOrder => _sortOrder.stream;
+
+  SortBy get lastSortBy => _sortBy.value;
+  SortOrder get lastSortOrder => _sortOrder.value;
 
   TasksBloc() {
     getTasks();
+    _sortBy.sink.add(SortBy.DueDate);
+    _sortOrder.sink.add(SortOrder.Ascending);
   }
 
   getTasks() async {
@@ -27,7 +34,7 @@ class TasksBloc {
   }
 
   addBatch(List<Task> tasks) async {
-    for(Task task in tasks) {
+    for (Task task in tasks) {
       await DBProvider.db.insertTask(task);
     }
     await getTasks();
@@ -48,8 +55,18 @@ class TasksBloc {
     await getTasks();
   }
 
+  setSortBy(SortBy sortBy) {
+    _sortBy.sink.add(sortBy);
+  }
+
+  setSortOrder(SortOrder sortOrder) {
+    _sortOrder.sink.add(sortOrder);
+  }
+
   dispose() {
     _tasks.close();
+    _sortBy.close();
+    _sortOrder.close();
   }
 }
 
@@ -58,20 +75,6 @@ enum SortBy {
   DueDate,
   PercentComplete,
   EstimatedDuration,
-}
-
-Function(Task, Task) sortMethodFromSortBy(SortBy sortBy) {
-  switch (sortBy) {
-    case SortBy.Title:
-      return (Task task1, Task task2) => task1.title.compareTo(task2.title);
-    case SortBy.DueDate:
-      return (Task task1, Task task2) => task1.dueDate.compareTo(task2.dueDate);
-    case SortBy.PercentComplete:
-      return (Task task1, Task task2) => task1.percentComplete.compareTo(task2.percentComplete);
-    case SortBy.EstimatedDuration:
-      return (Task task1, Task task2) => task1.estimatedDuration.compareTo(task2.estimatedDuration);
-  }
-  return null;
 }
 
 enum SortOrder {

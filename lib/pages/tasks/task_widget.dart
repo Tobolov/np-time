@@ -97,20 +97,24 @@ class TaskWidget extends StatelessWidget {
     //todo set onTap handlers
 
     double minWidth = 16;
-    
+
     // snuff if disabled
     if (_snuffAlerts) {
-      return SizedBox(width: minWidth,);
+      return SizedBox(
+        width: minWidth,
+      );
     }
 
     // task is overdue
     if (_task.dueDate.compareTo(DateTime.now()) < 0) {
-      return _buildAlertButton(icon: Icons.error, color: CustomTheme.errorColor, onTap: () {});
+      return _buildAlertButton(
+          icon: Icons.error, color: CustomTheme.errorColor, onTap: () {});
     }
 
     // task due in 3 days
     if (_task.dueDate.compareTo(DateTime.now().add(Duration(days: 3))) < 0) {
-      return _buildAlertButton(icon: Icons.warning, color: CustomTheme.accent, onTap: () {});
+      return _buildAlertButton(
+          icon: Icons.warning, color: CustomTheme.accent, onTap: () {});
     }
 
     //todo task stale
@@ -124,24 +128,24 @@ class TaskWidget extends StatelessWidget {
       }
       if (lastLoggedTime.difference(DateTime.now()) > Duration(days: 3)) {
         // task has not been worked on for 3 days.
-        return _buildAlertButton(icon: Icons.warning, color: CustomTheme.accent, onTap: () {});
+        return _buildAlertButton(
+            icon: Icons.warning, color: CustomTheme.accent, onTap: () {});
       }
     }
-    return SizedBox(width: minWidth,);
+    return SizedBox(
+      width: minWidth,
+    );
   }
 
   Widget _buildAlertButton(
       {@required IconData icon, @required Color color, @required Function onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        alignment: Alignment.center,
-        margin: EdgeInsets.symmetric(horizontal: 16),
-        child: Icon(
-          icon,
-          color: color,
-        ),
+    return IconButton(
+      padding: EdgeInsets.only(right: 16),
+      icon: Icon(
+        icon,
+        color: color,
       ),
+      onPressed: onTap,
     );
   }
 }

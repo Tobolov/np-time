@@ -20,12 +20,14 @@ class TaskDetailer extends StatelessWidget {
         actions: _buildAppBarActions(context),
       ),
       body: _buildBody(context),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.timer),
-        onPressed: () {
-          //todo timer
-        },
-      ),
+      floatingActionButton: _task.isSimple
+          ? FloatingActionButton(
+              child: Icon(Icons.timer),
+              onPressed: () {
+                //todo timer
+              },
+            )
+          : null,
     );
   }
 
@@ -353,6 +355,12 @@ class TaskDetailer extends StatelessWidget {
                 ),
               ),
             ),
+            IconButton(
+              icon: Icon(Icons.timer),
+              onPressed: () {
+                //todo timer pressed
+              },
+            )
           ],
         ),
       ),

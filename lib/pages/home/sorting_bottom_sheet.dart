@@ -18,8 +18,8 @@ class _SortingBottomSheetState extends State<SortingBottomSheet> {
   void initState() {
     super.initState();
 
-    radioSortingMethodOption = tasksBloc.sortBy;
-    radioSortingOrderOption = tasksBloc.sortOrder;
+    radioSortingMethodOption = tasksBloc.lastSortBy;
+    radioSortingOrderOption = tasksBloc.lastSortOrder;
   }
 
   @override
@@ -73,7 +73,11 @@ class _SortingBottomSheetState extends State<SortingBottomSheet> {
                           color: CustomTheme.primaryColor,
                         ),
                       ),
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () {
+                        tasksBloc.setSortBy(radioSortingMethodOption);
+                        tasksBloc.setSortOrder(radioSortingOrderOption);
+                        Navigator.pop(context);
+                      },
                     ),
                   ],
                 ),
