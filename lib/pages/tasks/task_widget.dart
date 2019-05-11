@@ -65,16 +65,16 @@ class TaskWidget extends StatelessWidget {
     return Expanded(
       child: Container(
         alignment: Alignment.centerLeft,
-        margin: EdgeInsets.zero,
+        margin: EdgeInsets.symmetric(vertical: 5),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
               _task.title,
               style: TextStyle(
-                fontSize: 26,
+                fontSize: 25,
                 fontFamily: 'RobotoCondensed',
-                fontWeight: FontWeight.w400,
+                fontWeight: FontWeight.w300,
                 color: CustomTheme.textPrimary,
               ),
             ),
@@ -95,10 +95,12 @@ class TaskWidget extends StatelessWidget {
 
   Widget _buildAlertSector(BuildContext context) {
     //todo set onTap handlers
+
+    double minWidth = 16;
     
     // snuff if disabled
     if (_snuffAlerts) {
-      return Container();
+      return SizedBox(width: minWidth,);
     }
 
     // task is overdue
@@ -125,7 +127,7 @@ class TaskWidget extends StatelessWidget {
         return _buildAlertButton(icon: Icons.warning, color: CustomTheme.accent, onTap: () {});
       }
     }
-    return Container();
+    return SizedBox(width: minWidth,);
   }
 
   Widget _buildAlertButton(

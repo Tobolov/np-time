@@ -7,7 +7,7 @@ import 'package:np_time/models/task.dart';
 
 class TasksBloc {
   final _tasks = BehaviorSubject<List<Task>>();
-  SortBy sortBy = SortBy.Title;
+  SortBy sortBy = SortBy.DueDate;
   SortOrder sortOrder = SortOrder.Ascending;
 
   Observable<List<Task>> get tasks => _tasks.stream;
@@ -23,6 +23,13 @@ class TasksBloc {
 
   add(Task task) async {
     await DBProvider.db.insertTask(task);
+    await getTasks();
+  }
+
+  addBatch(List<Task> tasks) async {
+    for(Task task in tasks) {
+      await DBProvider.db.insertTask(task);
+    }
     await getTasks();
   }
 

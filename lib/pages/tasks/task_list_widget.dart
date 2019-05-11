@@ -70,6 +70,7 @@ class TasksList extends StatelessWidget {
                 return Container(
                   margin: EdgeInsets.only(top: 6),
                   child: ListView.separated(
+                    padding: EdgeInsets.only(bottom: 70),
                     itemCount: tasks.length,
                     itemBuilder: (BuildContext context, int index) {
                       Task task = tasks[index];

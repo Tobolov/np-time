@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:grec_minimal/grec_minimal.dart';
 import 'package:np_time/db/database.dart';
+import 'package:np_time/pages/home/fake_entries.dart';
 import 'package:np_time/pages/home/home_bloc.dart';
 import 'package:np_time/pages/home/sorting_bottom_sheet.dart';
 
@@ -98,7 +100,7 @@ class HomeWrapper extends StatelessWidget {
             ),
             PopupMenuItem<DropdownChoice>(
               value: DropdownChoice.CreateFakeDatabase,
-              child: Text('Create fake database'),
+              child: Text('Add fake entries'),
             ),
             PopupMenuItem<DropdownChoice>(
               value: DropdownChoice.DeleteDatabse,
@@ -113,7 +115,7 @@ class HomeWrapper extends StatelessWidget {
   void _dropdownOnSelected(DropdownChoice choice) {
     switch (choice) {
       case DropdownChoice.CreateFakeDatabase:
-        //todo add fake data
+        FakeEntries.addEntries();
         break;
 
       case DropdownChoice.DeleteDatabse:
@@ -125,6 +127,7 @@ class HomeWrapper extends StatelessWidget {
         break;
     }
   }
+
   void _showSortingTasksBottomSheet() {
     showModalBottomSheetApp<void>(
       context: _context,

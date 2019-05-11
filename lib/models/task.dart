@@ -79,7 +79,7 @@ class Task {
         'id': id,
         'title': title,
         'deleted': deleted,
-        'description': description,
+        'description': description ?? '',
         'dueDate': dueDate.toIso8601String(),
         'rRule': rRule?.asRuleText() ?? '',
         'notification': List<String>.from(
