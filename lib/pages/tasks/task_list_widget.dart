@@ -11,8 +11,18 @@ import 'package:np_time/models/logged_time.dart';
 class TasksList extends StatelessWidget {
   final String noData;
   final String searchFilter;
+  final Function(Task, Task) sortingFunction;
+  final int maxDisplayedTasks;
+  final bool snuffAlerts;
+  final bool scrollable;
 
-  TasksList({@required this.noData, this.searchFilter});
+  TasksList(
+      {@required this.noData,
+      this.searchFilter,
+      this.sortingFunction,
+      this.maxDisplayedTasks,
+      this.snuffAlerts = false,
+      this.scrollable = true});
 
   @override
   Widget build(BuildContext context) {
@@ -30,26 +40,70 @@ class TasksList extends StatelessWidget {
               );
             } else {
               List<Task> tasks = snapshot.data;
+
+              //remove deleted tasks
               tasks.removeWhere((task) => task.deleted);
+
+              //filter tasks
               if (searchFilter != null) {
-                tasks = tasks.where((task) => task.title.toLowerCase().contains(searchFilter.toLowerCase())).toList();
+                tasks = tasks
+                    .where((task) =>
+                        task.title.toLowerCase().contains(searchFilter.toLowerCase()))
+                    .toList();
               }
-              return Container(
-                margin: EdgeInsets.only(top: 6),
-                child: ListView.separated(
-                  itemCount: tasks.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    Task task = tasks[index];
-                    return TaskWidget(task);
-                  },
-                  separatorBuilder: (context, index) {
-                    return Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: Divider(color: CustomTheme.textDisabled),
-                    );
-                  },
-                ),
-              );
+
+              //sort tasks
+              if (sortingFunction != null) {
+                tasks.sort(sortingFunction);
+              }
+
+              //limit displayed tasks
+              if (maxDisplayedTasks != null) {
+                int maxTasks =
+                    maxDisplayedTasks > tasks.length ? tasks.length : maxDisplayedTasks;
+                tasks = tasks.sublist(0, maxTasks);
+              }
+
+              if (scrollable) {
+                return Container(
+                  margin: EdgeInsets.only(top: 6),
+                  child: ListView.separated(
+                    itemCount: tasks.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      Task task = tasks[index];
+                      return TaskWidget(task, snuffAlerts);
+                    },
+                    separatorBuilder: (context, index) {
+                      return Container(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Divider(color: CustomTheme.textDisabled),
+                      );
+                    },
+                  ),
+                );
+              } else {
+                return Container(
+                  margin: EdgeInsets.only(top: 6),
+                  child: Column(
+                    children: () {
+                      List<Widget> widgets = [];
+
+                      for (int i = 0; i < tasks.length; i++) {
+                        widgets.add(TaskWidget(tasks[i], snuffAlerts));
+                        
+                        // add divider if not last element
+                        if (i != tasks.length - 1) {
+                          widgets.add(Container(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            child: Divider(color: CustomTheme.textDisabled),
+                          ));
+                        }
+                      }
+                      return widgets;
+                    }(),
+                  ),
+                );
+              }
             }
           } else {
             return Center(child: CircularProgressIndicator());

@@ -60,14 +60,14 @@ class TaskDetailer extends StatelessWidget {
           return <Widget>[
             _buildDescriptionRow(context),
             _buildDivider(context),
-            _buildEstimatedTimeRow(context),
-            _buildDivider(context),
           ];
         }(),
         ...() {
           // show subtask list if not simple
           if (_task.isSimple) {
-            return <Widget>[];
+            return <Widget>[
+              _buildEstimatedTimeRow(context),
+            ];
           }
           return <Widget>[
             _buildSubtasksRow(context),

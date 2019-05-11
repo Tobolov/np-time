@@ -6,8 +6,9 @@ import '../../theme.dart';
 
 class TaskWidget extends StatelessWidget {
   final Task _task;
+  final bool _snuffAlerts;
 
-  TaskWidget(this._task);
+  TaskWidget(this._task, this._snuffAlerts);
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +95,11 @@ class TaskWidget extends StatelessWidget {
 
   Widget _buildAlertSector(BuildContext context) {
     //todo set onTap handlers
+    
+    // snuff if disabled
+    if (_snuffAlerts) {
+      return Container();
+    }
 
     // task is overdue
     if (_task.dueDate.compareTo(DateTime.now()) < 0) {
