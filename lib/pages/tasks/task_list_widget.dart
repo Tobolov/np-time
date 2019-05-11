@@ -30,8 +30,9 @@ class TasksList extends StatelessWidget {
               );
             } else {
               List<Task> tasks = snapshot.data;
+              tasks.removeWhere((task) => task.deleted);
               if (searchFilter != null) {
-                tasks = tasks.where((task) => task.title.contains(searchFilter)).toList();
+                tasks = tasks.where((task) => task.title.toLowerCase().contains(searchFilter.toLowerCase())).toList();
               }
               return Container(
                 margin: EdgeInsets.only(top: 6),

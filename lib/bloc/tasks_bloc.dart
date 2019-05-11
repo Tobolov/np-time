@@ -15,9 +15,14 @@ class TasksBloc {
     _tasks.sink.add(await DBProvider.db.getAllTasks());
   }
 
-  add(Task task) async {
+  addOrEdit(Task task) async {
     await DBProvider.db.insertTask(task);
     await getTasks();
+  }
+
+  delete(Task task) async {
+    task.deleted = true;
+    addOrEdit(task);
   }
 
   dispose() {

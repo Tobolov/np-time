@@ -9,6 +9,10 @@ import 'package:intl/intl.dart';
 import 'package:np_time/widgets/dial_selector.dart';
 
 class TaskMutation extends StatefulWidget {
+  final Task taskToEdit;
+
+  TaskMutation({this.taskToEdit});
+
   @override
   State<StatefulWidget> createState() {
     return _TaskMutationState();
@@ -16,7 +20,7 @@ class TaskMutation extends StatefulWidget {
 }
 
 class _TaskMutationState extends State<TaskMutation> {
-  final Task _task = Task.simple;
+  Task _task;
   var scaffold = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
   final _titleKey = GlobalKey<FormFieldState>();
@@ -31,6 +35,12 @@ class _TaskMutationState extends State<TaskMutation> {
     7: 'Sunday',
     null: '???',
   };
+
+  @override
+  void initState() {
+    super.initState();
+    _task = widget.taskToEdit ?? Task.simple;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,41 +99,43 @@ class _TaskMutationState extends State<TaskMutation> {
               fontFamily: 'RobotoCondensed',
             ),
           ),
-          onPressed: () {
-            // validate all TextFormFields (subtask names)
-            if (!_formKey.currentState.validate()) {
-              return;
-            }
-
-            _formKey.currentState.save();
-            _titleKey.currentState.save();
-
-            if (_task.title.isEmpty) {
-              _displaySnackbar(label: 'Please set a title.');
-              return;
-            }
-
-            if (_task.dueDate == null) {
-              _displaySnackbar(label: 'Please set a due date.');
-              return;
-            }
-
-            if (_task.estimatedDuration == null) {
-              _displaySnackbar(label: 'Please set an estimated duration.');
-              return;
-            }
-
-            if (_task.estimatedDuration == Duration.zero) {
-              _displaySnackbar(label: 'Estimated duration can\'t be zero.');
-              return;
-            }
-
-            tasksBloc.add(_task);
-            Navigator.pop(context);
-          },
+          onPressed: () => _onSave(),
         ),
       )
     ];
+  }
+
+  void _onSave() {
+// validate all TextFormFields (subtask names)
+    if (!_formKey.currentState.validate()) {
+      return;
+    }
+
+    _formKey.currentState.save();
+    _titleKey.currentState.save();
+
+    if (_task.title.isEmpty) {
+      _displaySnackbar(label: 'Please set a title.');
+      return;
+    }
+
+    if (_task.dueDate == null) {
+      _displaySnackbar(label: 'Please set a due date.');
+      return;
+    }
+
+    if (_task.estimatedDuration == null) {
+      _displaySnackbar(label: 'Please set an estimated duration.');
+      return;
+    }
+
+    if (_task.estimatedDuration == Duration.zero) {
+      _displaySnackbar(label: 'Estimated duration can\'t be zero.');
+      return;
+    }
+
+    tasksBloc.addOrEdit(_task);
+    Navigator.pop(context);
   }
 
   Widget _buildBody(BuildContext context) {
@@ -784,9 +796,8 @@ class _TaskMutationState extends State<TaskMutation> {
               fontSize: 19,
               fontFamily: 'RobotoCondensed',
               fontWeight: FontWeight.w300,
-              color: simpleTask == 0
-                  ? CustomTheme.textPrimary
-                  : CustomTheme.textSecondary,
+              color:
+                  simpleTask == 0 ? CustomTheme.textPrimary : CustomTheme.textSecondary,
             ),
           ),
         ),

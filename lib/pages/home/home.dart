@@ -61,23 +61,7 @@ class HomeWrapper extends StatelessWidget {
             homeBloc.updateFab(ApplicationFab(
               icon: Icons.add,
               onPressed: () {
-                //todo Fab interaction
-                print("-- todo create task --");
-
-                /*tasksBloc.add(
-                  Task(
-                    title: 'test',
-                    description: 'UwU',
-                    dueDate: DateTime.now(),
-                    notification: <String>['1m', '5m'],
-                    repeatCycle: '',
-                    repeatStartDate: DateTime.now(),
-                    deleted: false,
-                    subtasks: <Subtask>[],
-                  ),
-                );*/
-
-                Navigator.pushNamed(context, '/create');
+                Navigator.pushNamed(context, '/task/create');
               },
             ));
         }

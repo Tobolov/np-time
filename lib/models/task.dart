@@ -126,7 +126,7 @@ class Task {
 
     double percent = totalLoggedTime.inSeconds / totalEstimatedDuration.inSeconds;
 
-    return percent.isFinite ? percent : 0;
+    return (percent.isFinite ? percent : 0) * 100.0;
   }
 
   String _generateEstimatedDurationString(Duration duration) {

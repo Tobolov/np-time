@@ -23,15 +23,7 @@ class TaskWidget extends StatelessWidget {
         ),
       ),
       onTap: () {
-        final snackBar = SnackBar(
-          content: Text('Not yet implemented.'),
-          duration: Duration(seconds: 4),
-          action: SnackBarAction(
-            label: 'DISMISS',
-            onPressed: () {},
-          ),
-        );
-        Scaffold.of(context).showSnackBar(snackBar);
+        Navigator.pushNamed(context, '/task/view', arguments: _task);
       },
     );
   }
