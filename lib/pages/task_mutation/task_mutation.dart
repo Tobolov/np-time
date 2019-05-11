@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:grec_minimal/grec_minimal.dart';
 import 'package:np_time/models/subtask.dart';
@@ -134,7 +136,11 @@ class _TaskMutationState extends State<TaskMutation> {
       return;
     }
 
-    tasksBloc.addOrEdit(_task);
+    if (widget.taskToEdit == null) {
+      tasksBloc.add(_task);
+    } else {
+      tasksBloc.edit(_task);
+    }
     Navigator.pop(context);
   }
 

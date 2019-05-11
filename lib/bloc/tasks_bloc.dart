@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:rxdart/rxdart.dart';
 
 import 'package:np_time/db/database.dart';
@@ -12,17 +14,23 @@ class TasksBloc {
   }
 
   getTasks() async {
-    _tasks.sink.add(await DBProvider.db.getAllTasks());
+    var tasks = await DBProvider.db.getAllTasks();
+    _tasks.sink.add(tasks);
   }
 
-  addOrEdit(Task task) async {
+  add(Task task) async {
     await DBProvider.db.insertTask(task);
+    await getTasks();
+  }
+
+  edit(Task task) async {
+    await DBProvider.db.updateTask(task);
     await getTasks();
   }
 
   delete(Task task) async {
     task.deleted = true;
-    addOrEdit(task);
+    edit(task);
   }
 
   dispose() {

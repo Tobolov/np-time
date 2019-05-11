@@ -84,7 +84,7 @@ class Task {
         'notification': List<String>.from(
           notification.map((duration) => duration.inDays.toString()),
         ).join(','),
-        'subtasks': new List<dynamic>.from(subtasks.map((subtask) => subtask.toMap())),
+        'subtasks': new List<Map<String, dynamic>>.from(subtasks.map((subtask) => subtask.toMap())),
       };
 
   Duration _calculateEstimatedDuration() {

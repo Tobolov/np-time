@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:np_time/db/database.dart';
 import 'package:np_time/pages/home/home_bloc.dart';
 
 import 'package:np_time/pages/summary/summary.dart';
@@ -23,6 +24,7 @@ class HomeWrapper extends StatelessWidget {
           actions: _buildAppBarActions(context),
         ),
         body: TabBarView(
+          physics: NeverScrollableScrollPhysics(),
           children: <Widget>[
             SummaryPage(),
             TasksPage(),
@@ -78,6 +80,12 @@ class HomeWrapper extends StatelessWidget {
             context: context,
             delegate: CustomSearchDelegate(),
           );
+        },
+      ),
+      IconButton(
+        icon: Icon(Icons.new_releases),
+        onPressed: () {
+          DBProvider.db.deleteDB();
         },
       ),
     ];

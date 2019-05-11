@@ -98,14 +98,16 @@ class DBProvider {
 //=======================================================================================
 //                                       Tasks
 //=======================================================================================
-
+  /*
+    Inserts a task and its subtasks. LoggedTime unaware.
+  */
   Future<int> insertTask(Task insertTask) async {
     final db = await database;
     Map<String, dynamic> newTask = insertTask.toMap();
     newTask.remove('subtasks');
     List<Subtask> subtasks = insertTask.subtasks;
     var newTaskId = await db.rawQuery("SELECT MAX($taskId)+1 as $taskId FROM $tableTask");
-    int id = newTaskId.first["id"];
+    int id = newTaskId.first["id"] ?? 1;
     newTask['id'] = id;
     int res = await db.insert('$tableTask', newTask);
 
@@ -115,17 +117,7 @@ class DBProvider {
       subtaskMap['id'] = i++;
       subtaskMap['taskId'] = id;
       subtaskMap.remove('loggedTimes');
-      List<LoggedTime> loggedTimes = subtask.loggedTimes;
       res += await db.insert('$tableSubtask', subtaskMap);
-
-      int j = 0;
-      for (LoggedTime loggedTime in loggedTimes) {
-        Map<String, dynamic> loggedTimeMap = loggedTime.toMap();
-        loggedTimeMap['id'] = j++;
-        loggedTimeMap['subtaskId'] = i;
-        loggedTimeMap['taskId'] = id;
-        res += await db.insert('$tableLoggedtime', loggedTimeMap);
-      }
     }
 
     return res;
@@ -185,12 +177,65 @@ class DBProvider {
     }
   }
 
-  //todo. how to chain differences? e.g subtask deleted? subtask added?
   /*
+    changes are only reflected to task + subtasks. Logged time must be updated using .logTime()
+  */
   Future<int> updateTask(Task updatedTask) async {
     final db = await database;
     Map<String, dynamic> updatedTaskMap = updatedTask.toMap();
-    List<Subtask> updatedOrNewSubtasks = updatedTaskMap.remove('subtasks');
+
+    // get old and new subtasks for comparision
+    List<Map<String, dynamic>> oldSubtasksMap =
+        await _fetchTaskComponenets(updatedTask.id);
+    List<Map<String, dynamic>> newSubtasksMap = updatedTaskMap.remove('subtasks');
+
+    // find subtasks which were removed and delete them
+    for (Map<String, dynamic> oldSubtask in oldSubtasksMap) {
+      bool subtaskFound = false;
+      for (Map<String, dynamic> newSubtask in newSubtasksMap) {
+        if (oldSubtask[subtaskId] == newSubtask[subtaskId]) {
+          subtaskFound = true;
+          break;
+        }
+      }
+      if (!subtaskFound) {
+        // delete the removed subtask
+        Map<String, dynamic> removedSubtask = oldSubtask;
+        await db.delete(
+          '$tableLoggedtime',
+          where: '$loggedtimeTaskId = ? AND $loggedtimeSubtaskId = ?',
+          whereArgs: [updatedTask.id, removedSubtask[subtaskId]]
+        );
+        await db.delete(
+          '$tableSubtask',
+          where: '$subtaskTaskId = ? AND $subtaskId = ?',
+          whereArgs: [updatedTask.id, removedSubtask[subtaskId]]
+        );
+      }
+    }
+
+    // find subtasks which where created and add them
+    for (Map<String, dynamic> newSubtask in newSubtasksMap) {
+      bool subtaskFound = false;
+      for (Map<String, dynamic> oldSubtask in oldSubtasksMap) {
+        if (oldSubtask[subtaskId] == newSubtask[subtaskId]) {
+          subtaskFound = true;
+          break;
+        }
+      }
+      if (!subtaskFound) {
+        // add the new subtask
+        Map<String, dynamic> addedSubtaskMap = newSubtask;
+        addedSubtaskMap[subtaskTaskId] = updatedTask.id;
+
+        // give the new subtask an id
+        var newSubtaskId = (await db.rawQuery("SELECT MAX($subtaskId)+1 as $subtaskId FROM $tableSubtask")).first[subtaskId] ?? 1;
+        addedSubtaskMap[subtaskId] = newSubtaskId;
+        addedSubtaskMap.remove('loggedTimes');
+
+        await db.insert('$tableSubtask', addedSubtaskMap);
+      }
+    }
 
     var res = await db.update(
       '$tableTask',
@@ -200,7 +245,10 @@ class DBProvider {
     );
     return res;
   }
-  */
+
+  Future<int> logTime(Subtask updatedSubtask) async {
+    return 1;
+  }
 
   Future close() async => db.close();
 }

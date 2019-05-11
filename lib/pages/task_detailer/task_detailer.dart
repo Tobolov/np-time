@@ -28,13 +28,14 @@ class TaskDetailer extends StatelessWidget {
       IconButton(
         icon: Icon(Icons.edit),
         onPressed: () {
-          tasksBloc.addOrEdit(_task);
+          Navigator.pushNamed(context, '/task/create', arguments: _task);
         },
       ),
       IconButton(
         icon: Icon(Icons.delete),
         onPressed: () {
           tasksBloc.delete(_task);
+          Navigator.pop(context);
         },
       ),
     ];

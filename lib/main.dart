@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:np_time/models/task.dart';
@@ -40,7 +42,11 @@ class MyApp extends StatelessWidget {
         switch (route.name) {
           case '/task/create':
             Task task = route.arguments as Task;
-            return MaterialPageRoute(builder: (context) => TaskMutation(taskToEdit: task,));
+            return MaterialPageRoute(
+              builder: (context) => TaskMutation(
+                    taskToEdit: task,
+                  ),
+            );
 
           case '/task/view':
             Task task = route.arguments as Task;
