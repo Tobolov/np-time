@@ -682,7 +682,7 @@ class _TaskMutationState extends State<TaskMutation> {
     Color estimatedDurationLabelColor = CustomTheme.textPrimary;
 
     // display estimated duration directly if not simple task
-    if (_task.subtasks[0].name != '__simple__') {
+    if (!_task.isSimple) {
       estimatedDurationLabel = _task.estimatedDurationString();
       estimatedDurationLabelColor = CustomTheme.textDisabled;
     } else {
@@ -720,14 +720,14 @@ class _TaskMutationState extends State<TaskMutation> {
   }
 
   void _selectSimpleEstimatedTime(BuildContext context) async {
-    if (_task.subtasks[0].name != '__simple__') {
+    if (!_task.isSimple) {
       _displaySnackbar(
         label: 'You can\'t set the estimated time of a task while subtasks exist.',
       );
       return;
     }
     _displayEstimatedTimeDialog(context, onSelected: (Duration duration) {
-      setState(() => _task.subtasks[0].estimatedTime = duration);
+      setState(() => _task.subtasks[0].estimatedDuration = duration);
     }, initalDuration: _task.estimatedDuration);
   }
 
@@ -759,9 +759,7 @@ class _TaskMutationState extends State<TaskMutation> {
   List<Widget> _buildSubtasksList() {
     List<Widget> widgets = [];
 
-    bool simpleTask = _task.subtasks[0].name == '__simple__';
-
-    if (!simpleTask) {
+    if (!_task.isSimple) {
       // add the subtasks
       for (int index = 0; index < _task.subtasks.length; index++) {
         widgets.add(
@@ -797,13 +795,13 @@ class _TaskMutationState extends State<TaskMutation> {
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 0),
           child: Text(
-            simpleTask ? 'Add a subtask' : 'Add another subtask',
+            _task.isSimple ? 'Add a subtask' : 'Add another subtask',
             style: TextStyle(
               fontSize: 19,
               fontFamily: 'RobotoCondensed',
               fontWeight: FontWeight.w300,
               color:
-                  simpleTask == 0 ? CustomTheme.textPrimary : CustomTheme.textSecondary,
+                  _task.isSimple ? CustomTheme.textPrimary : CustomTheme.textSecondary,
             ),
           ),
         ),
@@ -848,7 +846,7 @@ class _TaskMutationState extends State<TaskMutation> {
   Widget _buildSubtaskEstimatedTime(BuildContext context, int index) {
     String estimatedDurationLabel;
 
-    if (_task.subtasks[index].estimatedTime == Duration.zero) {
+    if (_task.subtasks[index].estimatedDuration == Duration.zero) {
       estimatedDurationLabel = 'Set estimated time';
     } else {
       estimatedDurationLabel = _task.estimatedDurationString(subtaskIndex: index);
@@ -857,7 +855,7 @@ class _TaskMutationState extends State<TaskMutation> {
     return GestureDetector(
       onTap: () {
         _displayEstimatedTimeDialog(context, onSelected: (Duration duration) {
-          setState(() => _task.subtasks[index].estimatedTime = duration);
+          setState(() => _task.subtasks[index].estimatedDuration = duration);
         });
       },
       child: Row(

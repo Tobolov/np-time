@@ -16,12 +16,13 @@ class Subtask {
   int id;
   int taskId;
   String name;
-  Duration estimatedTime;
+  Duration estimatedDuration;
   List<LoggedTime> loggedTimes;
 
   Duration get totalLoggedTime => _calculateTotalLoggedTime();
+  double get percentComplete => _calculatePercentComplete();
   static Subtask get empty => Subtask(
-        estimatedTime: Duration(seconds: 0),
+        estimatedDuration: Duration(seconds: 0),
         name: '',
       );
 
@@ -29,7 +30,7 @@ class Subtask {
     this.id,
     this.taskId,
     @required this.name,
-    @required this.estimatedTime,
+    @required this.estimatedDuration,
     this.loggedTimes = const <LoggedTime>[],
   });
 
@@ -37,7 +38,7 @@ class Subtask {
       id: json['id'],
       taskId: json['taskId'],
       name: json['name'],
-      estimatedTime: Duration(seconds: json['estimatedTime']),
+      estimatedDuration: Duration(seconds: json['estimatedTime']),
       loggedTimes: new List<LoggedTime>.from(
           json['loggedTimes'].map((loggedTime) => LoggedTime.fromMap(loggedTime))));
 
@@ -45,7 +46,7 @@ class Subtask {
         'id': id,
         'taskId': taskId,
         'name': name,
-        'estimatedTime': estimatedTime.inSeconds,
+        'estimatedTime': estimatedDuration.inSeconds,
         'loggedTimes':
             new List<dynamic>.from(loggedTimes.map((loggedTime) => loggedTime.toMap()))
       };
@@ -56,5 +57,14 @@ class Subtask {
       totalDuration += loggedTime.timespan;
     }
     return totalDuration;
+  }
+
+  double _calculatePercentComplete() {
+    Duration totalEstimatedDuration = estimatedDuration;
+    Duration totalLoggedTime = _calculateTotalLoggedTime();
+
+    double percent = totalLoggedTime.inSeconds / totalEstimatedDuration.inSeconds;
+
+    return (percent.isFinite ? percent : 0) * 100.0;
   }
 }

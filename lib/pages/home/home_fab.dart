@@ -17,7 +17,6 @@ class _HomeFloatingActionButtonState extends State<HomeFloatingActionButton> {
   _HomeFloatingActionButtonState() {
     homeBloc.applicationFabs.listen(
       ((ApplicationFab applicationFab) {
-        print('TEST');
         if (applicationFab.icon != null && applicationFab.onPressed != null) {
           setState(() {
             _onPressed = applicationFab.onPressed;

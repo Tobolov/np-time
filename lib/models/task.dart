@@ -26,6 +26,7 @@ class Task {
   String get dueDateString => _dueDateString();
   Duration get totalLoggedTime => _calculateTotalLoggedTime();
   double get percentComplete => _calculatePercentComplete();
+  bool get isSimple => subtasks[0].name == '__simple__';
 
   Task({
     this.id,
@@ -48,7 +49,7 @@ class Task {
         subtasks: <Subtask>[
           Subtask(
             name: '__simple__',
-            estimatedTime: Duration(seconds: 0),
+            estimatedDuration: Duration(seconds: 0),
           )
         ],
       );
@@ -90,7 +91,7 @@ class Task {
   Duration _calculateEstimatedDuration() {
     Duration totalDuration = Duration(seconds: 0);
     for (Subtask subtask in subtasks) {
-      totalDuration += subtask.estimatedTime;
+      totalDuration += subtask.estimatedDuration;
     }
     return totalDuration;
   }
@@ -109,7 +110,7 @@ class Task {
     if (subtaskIndex == null) {
       totalEstimatedDuration = _calculateEstimatedDuration();
     } else {
-      totalEstimatedDuration = subtasks[subtaskIndex].estimatedTime;
+      totalEstimatedDuration = subtasks[subtaskIndex].estimatedDuration;
     }
     return _generateEstimatedDurationString(totalEstimatedDuration);
   }
@@ -141,14 +142,14 @@ class Task {
   }
 
   void addEmptySubtask() {
-    if (subtasks[0].name == '__simple__') {
+    if (this.isSimple) {
       // if simple task, convert to complex
-      Duration duration = subtasks[0].estimatedTime;
+      Duration duration = subtasks[0].estimatedDuration;
       subtasks.removeAt(0);
       subtasks.add(Subtask.empty);
 
       //retain previous estimated time
-      subtasks[0].estimatedTime = duration;
+      subtasks[0].estimatedDuration = duration;
 
     } else {
       subtasks.add(Subtask.empty);    
