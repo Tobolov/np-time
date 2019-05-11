@@ -9,4 +9,13 @@ class CustomTheme {
   static final Color primaryColor = const Color(0xFF00838F);
   static final Color backgroundColor = const Color(0xFF27272F);
   static final Color errorColor = const Color(0xFFC62828);
+
+  static TextStyle buildTextStyle({Color color, double size, FontWeight weight}) {
+    return TextStyle(
+      fontSize: size ?? 19,
+      fontFamily: 'RobotoCondensed',
+      fontWeight: weight ?? FontWeight.w300,
+      color: color ?? CustomTheme.textPrimary,
+    );
+  }
 }

@@ -7,6 +7,9 @@ import 'package:np_time/models/task.dart';
 
 class TasksBloc {
   final _tasks = BehaviorSubject<List<Task>>();
+  SortBy sortBy = SortBy.Title;
+  SortOrder sortOrder = SortOrder.Ascending;
+
   Observable<List<Task>> get tasks => _tasks.stream;
 
   TasksBloc() {
@@ -30,12 +33,43 @@ class TasksBloc {
 
   delete(Task task) async {
     task.deleted = true;
-    edit(task);
+    await edit(task);
+  }
+
+  deleteDatabase() async {
+    await DBProvider.db.deleteDB();
+    await getTasks();
   }
 
   dispose() {
     _tasks.close();
   }
+}
+
+enum SortBy {
+  Title,
+  DueDate,
+  PercentComplete,
+  EstimatedDuration,
+}
+
+Function(Task, Task) sortMethodFromSortBy(SortBy sortBy) {
+  switch (sortBy) {
+    case SortBy.Title:
+      return (Task task1, Task task2) => task1.title.compareTo(task2.title);
+    case SortBy.DueDate:
+      return (Task task1, Task task2) => task1.dueDate.compareTo(task2.dueDate);
+    case SortBy.PercentComplete:
+      return (Task task1, Task task2) => task1.percentComplete.compareTo(task2.percentComplete);
+    case SortBy.EstimatedDuration:
+      return (Task task1, Task task2) => task1.estimatedDuration.compareTo(task2.estimatedDuration);
+  }
+  return null;
+}
+
+enum SortOrder {
+  Ascending,
+  Descending,
 }
 
 final tasksBloc = TasksBloc();

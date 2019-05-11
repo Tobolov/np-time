@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:np_time/db/database.dart';
 import 'package:np_time/pages/home/home_bloc.dart';
+import 'package:np_time/pages/home/sorting_bottom_sheet.dart';
 
 import 'package:np_time/pages/summary/summary.dart';
 import 'package:np_time/pages/tasks/tasks.dart';
 import 'package:np_time/pages/history/history.dart';
+import 'package:np_time/widgets/modal_bottom_sheet.dart';
+import '../../theme.dart';
 import './home_search_delegate.dart';
 import './home_fab.dart';
 import 'package:np_time/bloc/tasks_bloc.dart';
@@ -13,8 +16,11 @@ import 'package:np_time/models/subtask.dart';
 import 'package:np_time/models/logged_time.dart';
 
 class HomeWrapper extends StatelessWidget {
+  BuildContext _context;
+
   @override
   Widget build(BuildContext context) {
+    _context = context;
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -82,12 +88,55 @@ class HomeWrapper extends StatelessWidget {
           );
         },
       ),
-      IconButton(
-        icon: Icon(Icons.new_releases),
-        onPressed: () {
-          DBProvider.db.deleteDB();
+      PopupMenuButton<DropdownChoice>(
+        onSelected: _dropdownOnSelected,
+        itemBuilder: (BuildContext context) {
+          return <PopupMenuItem<DropdownChoice>>[
+            PopupMenuItem<DropdownChoice>(
+              value: DropdownChoice.SortTasks,
+              child: Text('Sort tasks'),
+            ),
+            PopupMenuItem<DropdownChoice>(
+              value: DropdownChoice.CreateFakeDatabase,
+              child: Text('Create fake database'),
+            ),
+            PopupMenuItem<DropdownChoice>(
+              value: DropdownChoice.DeleteDatabse,
+              child: Text('Delete database'),
+            ),
+          ];
         },
       ),
     ];
   }
+
+  void _dropdownOnSelected(DropdownChoice choice) {
+    switch (choice) {
+      case DropdownChoice.CreateFakeDatabase:
+        //todo add fake data
+        break;
+
+      case DropdownChoice.DeleteDatabse:
+        tasksBloc.deleteDatabase();
+        break;
+
+      case DropdownChoice.SortTasks:
+        _showSortingTasksBottomSheet();
+        break;
+    }
+  }
+  void _showSortingTasksBottomSheet() {
+    showModalBottomSheetApp<void>(
+      context: _context,
+      builder: (BuildContext context) {
+        return SortingBottomSheet();
+      },
+    );
+  }
+}
+
+enum DropdownChoice {
+  CreateFakeDatabase,
+  DeleteDatabse,
+  SortTasks,
 }

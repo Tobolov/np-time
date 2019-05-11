@@ -55,6 +55,8 @@ class TasksList extends StatelessWidget {
               //sort tasks
               if (sortingFunction != null) {
                 tasks.sort(sortingFunction);
+              } else {
+                tasks.sort(sortMethodFromSortBy(tasksBloc.sortBy));
               }
 
               //limit displayed tasks
