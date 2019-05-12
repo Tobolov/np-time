@@ -120,7 +120,7 @@ class _TasksListState extends State<TasksList> {
 
               if (widget.scrollable) {
                 return Container(
-                  margin: EdgeInsets.only(top: 6),
+                  //margin: EdgeInsets.only(top: 6),
                   child: ListView.separated(
                     padding: EdgeInsets.only(bottom: 70),
                     itemCount: tasks.length,
@@ -130,15 +130,16 @@ class _TasksListState extends State<TasksList> {
                     },
                     separatorBuilder: (context, index) {
                       return Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Divider(color: CustomTheme.textDisabled),
+                        margin: EdgeInsets.symmetric(horizontal: 16),
+                        color: CustomTheme.textDisabled,
+                        height: 0.7,
                       );
                     },
                   ),
                 );
               } else {
                 return Container(
-                  margin: EdgeInsets.only(top: 6),
+                  //margin: EdgeInsets.only(top: 6),
                   child: Column(
                     children: () {
                       List<Widget> widgets = [];
@@ -150,8 +151,9 @@ class _TasksListState extends State<TasksList> {
                         // add divider if not last element
                         if (i != tasks.length - 1) {
                           widgets.add(Container(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                            child: Divider(color: CustomTheme.textDisabled),
+                            margin: EdgeInsets.symmetric(horizontal: 16),
+                            color: CustomTheme.textDisabled,
+                            height: 0.7,
                           ));
                         }
                       }

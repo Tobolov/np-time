@@ -277,16 +277,16 @@ class _TaskMutationState extends State<TaskMutation> {
 //=======================================================================================
 
   Widget _buildDueDateRow(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-      child: Row(
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(right: 16),
-            child: Icon(Icons.calendar_today),
-          ),
-          Expanded(
-            child: GestureDetector(
+    return InkWell(
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        child: Row(
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(right: 16),
+              child: Icon(Icons.calendar_today),
+            ),
+            Expanded(
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 6),
                 child: Text(
@@ -296,11 +296,11 @@ class _TaskMutationState extends State<TaskMutation> {
                   style: _buildTextStyle(context),
                 ),
               ),
-              onTap: () => _selectDate(context),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+      onTap: () => _selectDate(context),
     );
   }
 
@@ -337,9 +337,9 @@ class _TaskMutationState extends State<TaskMutation> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ..._buildNotificationList(context),
-              GestureDetector(
+              InkWell(
+                borderRadius: BorderRadius.circular(CustomTheme.borderRadius),
                 child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 0),
                   child: Text(
                     _task.notification.length == 0
                         ? 'Add a notification'
@@ -386,7 +386,8 @@ class _TaskMutationState extends State<TaskMutation> {
                   style: _buildTextStyle(context),
                 ),
               ),
-              GestureDetector(
+              InkWell(
+                borderRadius: BorderRadius.circular(CustomTheme.borderRadius),
                 child: Container(
                   margin: EdgeInsets.symmetric(horizontal: 16),
                   child: Icon(Icons.close),
@@ -412,7 +413,7 @@ class _TaskMutationState extends State<TaskMutation> {
         return SimpleDialog(
           contentPadding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(6)),
+            borderRadius: BorderRadius.all(Radius.circular(CustomTheme.borderRadius)),
           ),
           children: <Widget>[
             _buildNotificationOption(
@@ -515,17 +516,17 @@ class _TaskMutationState extends State<TaskMutation> {
 //=======================================================================================
 
   Widget _buildRepeatRow(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(top: 5, right: 16),
-            child: Icon(Icons.repeat),
-          ),
-          Expanded(
-            child: GestureDetector(
+    return InkWell(
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(top: 5, right: 16),
+              child: Icon(Icons.repeat),
+            ),
+            Expanded(
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 6),
                 child: Text(
@@ -533,11 +534,11 @@ class _TaskMutationState extends State<TaskMutation> {
                   style: _buildTextStyle(context),
                 ),
               ),
-              onTap: () => _selectRepeat(context),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+      onTap: () => _selectRepeat(context),
     );
   }
 
@@ -616,7 +617,7 @@ class _TaskMutationState extends State<TaskMutation> {
         return SimpleDialog(
           contentPadding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(6)),
+            borderRadius: BorderRadius.all(Radius.circular(CustomTheme.borderRadius)),
           ),
           children: <Widget>[
             _buildRepeatOption(
@@ -694,16 +695,16 @@ class _TaskMutationState extends State<TaskMutation> {
       }
     }
 
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-      child: Row(
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(right: 16),
-            child: Icon(CustomIcons.target),
-          ),
-          Expanded(
-            child: GestureDetector(
+    return InkWell(
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        child: Row(
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(right: 16),
+              child: Icon(CustomIcons.target),
+            ),
+            Expanded(
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 6),
                 child: Text(
@@ -711,11 +712,11 @@ class _TaskMutationState extends State<TaskMutation> {
                   style: _buildTextStyle(context, color: estimatedDurationLabelColor),
                 ),
               ),
-              onTap: () => _selectSimpleEstimatedTime(context),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+      onTap: () => _selectSimpleEstimatedTime(context),
     );
   }
 
@@ -775,7 +776,8 @@ class _TaskMutationState extends State<TaskMutation> {
                     color: CustomTheme.textDisabled,
                   ),
                   Expanded(child: _buildSubtaskCenterContent(index)),
-                  GestureDetector(
+                  InkWell(
+                    borderRadius: BorderRadius.circular(CustomTheme.borderRadius),
                       child: Container(
                         margin: EdgeInsets.symmetric(horizontal: 16),
                         child: Icon(Icons.close),
@@ -791,7 +793,8 @@ class _TaskMutationState extends State<TaskMutation> {
 
     // add the 'Add subtask' button
     widgets.add(
-      GestureDetector(
+      InkWell(
+        borderRadius: BorderRadius.circular(CustomTheme.borderRadius),
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 0),
           child: Text(
@@ -800,8 +803,7 @@ class _TaskMutationState extends State<TaskMutation> {
               fontSize: 19,
               fontFamily: 'RobotoCondensed',
               fontWeight: FontWeight.w300,
-              color:
-                  _task.isSimple ? CustomTheme.textPrimary : CustomTheme.textSecondary,
+              color: _task.isSimple ? CustomTheme.textPrimary : CustomTheme.textSecondary,
             ),
           ),
         ),
@@ -852,7 +854,8 @@ class _TaskMutationState extends State<TaskMutation> {
       estimatedDurationLabel = _task.estimatedDurationString(subtaskIndex: index);
     }
 
-    return GestureDetector(
+    return InkWell(
+      borderRadius: BorderRadius.circular(CustomTheme.borderRadius),
       onTap: () {
         _displayEstimatedTimeDialog(context, onSelected: (Duration duration) {
           setState(() => _task.subtasks[index].estimatedDuration = duration);

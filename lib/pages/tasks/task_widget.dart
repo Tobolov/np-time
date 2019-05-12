@@ -13,9 +13,9 @@ class TaskWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      child: Container(
+    return InkWell(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 8),
         child: Row(
           children: <Widget>[
             Container(
@@ -79,7 +79,7 @@ class TaskWidget extends StatelessWidget {
             Text(
               _task.title,
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 22,
                 fontFamily: 'RobotoCondensed',
                 fontWeight: FontWeight.w300,
                 color: CustomTheme.textPrimary,
@@ -88,7 +88,7 @@ class TaskWidget extends StatelessWidget {
             Text(
               _deletedDate ? _task.dueDateString : _task.dueDateString,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 13,
                 fontFamily: 'RobotoCondensed',
                 fontWeight: FontWeight.w300,
                 color: CustomTheme.textSecondary,

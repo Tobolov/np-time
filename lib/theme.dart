@@ -10,6 +10,8 @@ class CustomTheme {
   static final Color backgroundColor = const Color(0xFF27272F);
   static final Color errorColor = const Color(0xFFC62828);
 
+  static final double borderRadius = 6;
+
   static TextStyle buildTextStyle({Color color, double size, FontWeight weight}) {
     return TextStyle(
       fontSize: size ?? 19,
