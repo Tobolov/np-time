@@ -36,8 +36,10 @@ class _SortingBottomSheetState extends State<SortingBottomSheet> {
           ),
           _buildSortingMethodOption(label: 'Title', sortBy: SortBy.Title),
           _buildSortingMethodOption(label: 'Due date', sortBy: SortBy.DueDate),
-          _buildSortingMethodOption(label: 'Percent complete', sortBy: SortBy.PercentComplete),
-          _buildSortingMethodOption(label: 'Estimated Duration', sortBy: SortBy.EstimatedDuration),
+          _buildSortingMethodOption(
+              label: 'Percent complete', sortBy: SortBy.PercentComplete),
+          _buildSortingMethodOption(
+              label: 'Estimated Duration', sortBy: SortBy.EstimatedDuration),
           Container(
             padding: EdgeInsets.symmetric(vertical: 16),
             child: Divider(color: CustomTheme.textDisabled),
@@ -48,39 +50,37 @@ class _SortingBottomSheetState extends State<SortingBottomSheet> {
           ),
           _buildSortingOrderOption(label: 'Ascending', sortOrder: SortOrder.Ascending),
           _buildSortingOrderOption(label: 'Descending', sortOrder: SortOrder.Descending),
-          Expanded(
-            child: Align(
-              alignment: Alignment.bottomRight,
-              child: Padding(
-                padding: EdgeInsets.only(right: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    FlatButton(
-                      child: Text(
-                        'CANCEL',
-                        style: CustomTheme.buildTextStyle(
-                          color: CustomTheme.primaryColor,
-                        ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  FlatButton(
+                    child: Text(
+                      'CANCEL',
+                      style: CustomTheme.buildTextStyle(
+                        color: CustomTheme.primaryColor,
                       ),
-                      onPressed: () => Navigator.pop(context),
                     ),
-                    SizedBox(width: 16),
-                    FlatButton(
-                      child: Text(
-                        'DONE',
-                        style: CustomTheme.buildTextStyle(
-                          color: CustomTheme.primaryColor,
-                        ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  SizedBox(width: 16),
+                  FlatButton(
+                    child: Text(
+                      'DONE',
+                      style: CustomTheme.buildTextStyle(
+                        color: CustomTheme.primaryColor,
                       ),
-                      onPressed: () {
-                        tasksBloc.setSortBy(radioSortingMethodOption);
-                        tasksBloc.setSortOrder(radioSortingOrderOption);
-                        Navigator.pop(context);
-                      },
                     ),
-                  ],
-                ),
+                    onPressed: () {
+                      tasksBloc.setSortBy(radioSortingMethodOption);
+                      tasksBloc.setSortOrder(radioSortingOrderOption);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
               ),
             ),
           ),

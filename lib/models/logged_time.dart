@@ -19,8 +19,8 @@ class LoggedTime {
 
     LoggedTime({
         this.id,
-        @required this.taskId,
-        @required this.subtaskId,
+        this.taskId,
+        this.subtaskId,
         @required this.date,
         @required this.timespan,
     });

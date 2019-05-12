@@ -85,7 +85,8 @@ class Task {
         'notification': List<String>.from(
           notification.map((duration) => duration.inDays.toString()),
         ).join(','),
-        'subtasks': new List<Map<String, dynamic>>.from(subtasks.map((subtask) => subtask.toMap())),
+        'subtasks': new List<Map<String, dynamic>>.from(
+            subtasks.map((subtask) => subtask.toMap())),
       };
 
   Duration _calculateEstimatedDuration() {
@@ -118,16 +119,23 @@ class Task {
   String _dueDateString() {
     //todo make this a bit better
     int daysRemaining = dueDate.difference(DateTime.now()).inDays;
-    return '$daysRemaining days remaining';
+    if (daysRemaining == 0) {
+      return 'Due today';
+    } else if (daysRemaining == 1) {
+      return 'Due tommorow';
+    } else {
+      return 'Due in $daysRemaining days';
+    }
   }
 
   double _calculatePercentComplete() {
     Duration totalEstimatedDuration = _calculateEstimatedDuration();
     Duration totalLoggedTime = _calculateTotalLoggedTime();
 
-    double percent = totalLoggedTime.inSeconds / totalEstimatedDuration.inSeconds;
-
-    return (percent.isFinite ? percent : 0) * 100.0;
+    double ratio = totalLoggedTime.inSeconds / totalEstimatedDuration.inSeconds;
+    double percent = (ratio.isFinite ? ratio : 0) * 100.0;
+    double cappedPercent = percent > 100 ? 100 : percent;
+    return cappedPercent;
   }
 
   String _generateEstimatedDurationString(Duration duration) {
@@ -150,11 +158,9 @@ class Task {
 
       //retain previous estimated time
       subtasks[0].estimatedDuration = duration;
-
     } else {
-      subtasks.add(Subtask.empty);    
+      subtasks.add(Subtask.empty);
     }
-    
   }
 
   void removeSubtaskAt(int index) {

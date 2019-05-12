@@ -201,16 +201,12 @@ class DBProvider {
       if (!subtaskFound) {
         // delete the removed subtask
         Map<String, dynamic> removedSubtask = oldSubtask;
-        await db.delete(
-          '$tableLoggedtime',
-          where: '$loggedtimeTaskId = ? AND $loggedtimeSubtaskId = ?',
-          whereArgs: [updatedTask.id, removedSubtask[subtaskId]]
-        );
-        await db.delete(
-          '$tableSubtask',
-          where: '$subtaskTaskId = ? AND $subtaskId = ?',
-          whereArgs: [updatedTask.id, removedSubtask[subtaskId]]
-        );
+        await db.delete('$tableLoggedtime',
+            where: '$loggedtimeTaskId = ? AND $loggedtimeSubtaskId = ?',
+            whereArgs: [updatedTask.id, removedSubtask[subtaskId]]);
+        await db.delete('$tableSubtask',
+            where: '$subtaskTaskId = ? AND $subtaskId = ?',
+            whereArgs: [updatedTask.id, removedSubtask[subtaskId]]);
       }
     }
 
@@ -229,7 +225,10 @@ class DBProvider {
         addedSubtaskMap[subtaskTaskId] = updatedTask.id;
 
         // give the new subtask an id
-        var newSubtaskId = (await db.rawQuery("SELECT MAX($subtaskId)+1 as $subtaskId FROM $tableSubtask")).first[subtaskId] ?? 1;
+        var newSubtaskId = (await db.rawQuery(
+                    "SELECT MAX($subtaskId)+1 as $subtaskId FROM $tableSubtask"))
+                .first[subtaskId] ??
+            1;
         addedSubtaskMap[subtaskId] = newSubtaskId;
         addedSubtaskMap.remove('loggedTimes');
 
@@ -246,8 +245,31 @@ class DBProvider {
     return res;
   }
 
-  Future<int> logTime(Subtask updatedSubtask) async {
-    return 1;
+  /*
+    This will only add new loggedTimes. 
+    LoggedTimes can't be removed.
+  */
+  Future<void> logTime(Subtask updatedSubtask) async {
+    final db = await database;
+
+    // calculate largest id in use
+    int j = 0;
+    for (LoggedTime loggedTime in updatedSubtask.loggedTimes) {
+        if (j < (loggedTime.id ?? 0)) j = loggedTime.id;
+    }
+
+    // add logged times
+    for (LoggedTime loggedTime in updatedSubtask.loggedTimes) {
+      if (loggedTime.id != null) {
+        continue; // value exists in DB
+      }
+      Map<String, dynamic> loggedTimeMap = loggedTime.toMap();
+      loggedTimeMap['id'] = ++j;
+      loggedTimeMap['subtaskId'] = updatedSubtask.id;
+      loggedTimeMap['taskId'] = updatedSubtask.taskId;
+
+      await db.insert('$tableLoggedtime', loggedTimeMap);
+    }
   }
 
   Future close() async => db.close();

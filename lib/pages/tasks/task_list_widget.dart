@@ -95,7 +95,6 @@ class _TasksListState extends State<TasksList> {
 
               // reverse tasks
               if (orderBy == SortOrder.Descending) {
-                print('I ran');
                 tasks = tasks.reversed.toList();
               }
 

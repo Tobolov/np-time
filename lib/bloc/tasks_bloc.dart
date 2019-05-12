@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:np_time/models/subtask.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'package:np_time/db/database.dart';
@@ -61,6 +62,11 @@ class TasksBloc {
 
   setSortOrder(SortOrder sortOrder) {
     _sortOrder.sink.add(sortOrder);
+  }
+
+  logTime(Subtask subtask) async {
+    await DBProvider.db.logTime(subtask);
+    await getTasks();
   }
 
   dispose() {

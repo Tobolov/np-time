@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:np_time/models/task.dart';
 import 'package:np_time/pages/task_detailer/task_detailer.dart';
 import 'package:np_time/pages/task_mutation/task_mutation.dart';
+import 'package:np_time/pages/task_timer/task_timer.dart';
 
 import './pages/home/home.dart';
 import './db/database.dart';
@@ -51,8 +52,16 @@ class MyApp extends StatelessWidget {
           case '/task/view':
             Task task = route.arguments as Task;
             return MaterialPageRoute(builder: (context) => TaskDetailer(task));
+
+          case '/task/timer':
+            List<dynamic> vars = route.arguments as List<dynamic>;
+            Task task = vars[0] as Task;
+            int subtaskIndex = vars[1] as int;
+            return MaterialPageRoute(builder: (context) => TaskTimer(task, subtaskIndex));
         }
       },
     );
   }
+
+  //todo dispose all blocs on app close
 }

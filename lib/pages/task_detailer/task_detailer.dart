@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:grec_minimal/grec_minimal.dart';
 import 'package:np_time/models/subtask.dart';
@@ -7,11 +9,44 @@ import 'package:np_time/presentation/custom_icons_icons.dart';
 import 'package:np_time/theme.dart';
 import 'package:intl/intl.dart';
 import 'package:np_time/widgets/dial_selector.dart';
+import 'package:np_time/widgets/modal_bottom_sheet.dart';
 
-class TaskDetailer extends StatelessWidget {
+class TaskDetailer extends StatefulWidget {
   final Task _task;
 
   TaskDetailer(this._task);
+
+  @override
+  State<StatefulWidget> createState() {
+    return _TaskDetailerState();
+  }
+}
+
+class _TaskDetailerState extends State<TaskDetailer> {
+  Task _task;
+  StreamSubscription<List<Task>> tasksStreamSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _task = widget._task;
+
+    //listen for changes to task
+    tasksStreamSubscription = tasksBloc.tasks.listen((tasks) {
+      for (Task task in tasks) {
+        if (task.id == _task.id) {
+          _task = task;
+          break;
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    tasksStreamSubscription.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +59,7 @@ class TaskDetailer extends StatelessWidget {
           ? FloatingActionButton(
               child: Icon(Icons.timer),
               onPressed: () {
-                //todo timer
+                _displayLogTimeDialog(context, 0, false);
               },
             )
           : null,
@@ -358,12 +393,44 @@ class TaskDetailer extends StatelessWidget {
             IconButton(
               icon: Icon(Icons.timer),
               onPressed: () {
-                //todo timer pressed
+                _displayLogTimeDialog(context, index, true);
               },
             )
           ],
         ),
       ),
+    );
+  }
+
+//=======================================================================================
+//                                    Log Time
+//=======================================================================================
+  void _displayLogTimeDialog(BuildContext context, int subtaskIndex, bool isSubtask) {
+    showModalBottomSheetApp<void>(
+      context: context,
+      dismissOnTap: true,
+      builder: (BuildContext context1) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            _buildLogTimeItem(Icons.timer, 'Start timer', () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/task/timer', arguments: [_task, subtaskIndex]);
+            }),
+            _buildLogTimeItem(CustomIcons.wrench, 'Log time manually', () {}),
+            _buildLogTimeItem(
+                Icons.done, 'Mark ${isSubtask ? 'sub' : ''}task as complete', () {}),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildLogTimeItem(IconData icon, String title, Function onTap) {
+    return ListTile(
+      leading: Icon(icon, color: CustomTheme.textPrimary),
+      title: Text(title, style: CustomTheme.buildTextStyle()),
+      onTap: onTap,
     );
   }
 }

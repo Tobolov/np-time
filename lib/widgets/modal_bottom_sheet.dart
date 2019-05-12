@@ -21,7 +21,7 @@ class _ModalBottomSheetLayout extends SingleChildLayoutDelegate {
         minWidth: constraints.maxWidth,
         maxWidth: constraints.maxWidth,
         minHeight: 0.0,
-        maxHeight: constraints.maxHeight * 11.0 / 16.0,
+        maxHeight: constraints.maxHeight * 15.0 / 16.0,
     );
   }
 
@@ -90,7 +90,7 @@ class _ModalBottomSheetRoute<T> extends PopupRoute<T> {
   Duration get transitionDuration => _kBottomSheetDuration;
 
   @override
-  bool get barrierDismissible => false;
+  bool get barrierDismissible => true;
 
   @override
   final String barrierLabel;

@@ -18,4 +18,17 @@ class CustomTheme {
       color: color ?? CustomTheme.textPrimary,
     );
   }
+
+  static Widget buildDivider({double horizontalMargin, double verticalMargin}) {
+    return Container(
+      margin: EdgeInsets.symmetric(
+        horizontal: horizontalMargin ?? 16,
+        vertical: verticalMargin ?? 0,
+      ),
+      child: Divider(
+        height: 1,
+        color: CustomTheme.textDisabled,
+      ),
+    );
+  }
 }
