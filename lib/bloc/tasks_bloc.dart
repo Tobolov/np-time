@@ -29,6 +29,10 @@ class TasksBloc {
     _tasks.sink.add(tasks);
   }
 
+  List<Task> getLatestTasks() {
+    return _tasks.value;
+  }
+
   add(Task task) async {
     await DBProvider.db.insertTask(task);
     await getTasks();

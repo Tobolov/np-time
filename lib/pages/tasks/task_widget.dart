@@ -17,7 +17,16 @@ class TaskWidget extends StatelessWidget {
       child: Container(
         child: Row(
           children: <Widget>[
-            _buildPercentDisplay(context),
+            Container(
+                width: 77,
+                alignment: Alignment.center,
+                child: () {
+                  if (_task.percentComplete == 100) {
+                    return Icon(Icons.done, size: 33);
+                  } else {
+                    return _buildPercentDisplay(context);
+                  }
+                }()),
             _buildInformativeInformation(context),
             _buildAlertSector(context),
           ],
@@ -30,34 +39,31 @@ class TaskWidget extends StatelessWidget {
   }
 
   Widget _buildPercentDisplay(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      margin: EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: <Widget>[
-          Text(
-            _task.percentComplete.toInt().toString(),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          _task.percentComplete.toInt().toString(),
+          style: TextStyle(
+            fontSize: 28,
+            fontFamily: 'RobotoCondensed',
+            fontWeight: FontWeight.w300,
+            color: CustomTheme.textPrimary,
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.only(bottom: 5),
+          child: Text(
+            '%',
             style: TextStyle(
-              fontSize: 35,
-              fontFamily: 'RobotoCondensed',
-              fontWeight: FontWeight.w300,
-              color: CustomTheme.textPrimary,
+              fontSize: 28,
+              fontFamily: 'TitilliumWeb',
+              fontWeight: FontWeight.w200,
+              color: CustomTheme.textDisabled,
             ),
           ),
-          Container(
-            margin: EdgeInsets.only(bottom: 5),
-            child: Text(
-              '%',
-              style: TextStyle(
-                fontSize: 35,
-                fontFamily: 'TitilliumWeb',
-                fontWeight: FontWeight.w200,
-                color: CustomTheme.textDisabled,
-              ),
-            ),
-          )
-        ],
-      ),
+        )
+      ],
     );
   }
 
@@ -72,7 +78,7 @@ class TaskWidget extends StatelessWidget {
             Text(
               _task.title,
               style: TextStyle(
-                fontSize: 25,
+                fontSize: 20,
                 fontFamily: 'RobotoCondensed',
                 fontWeight: FontWeight.w300,
                 color: CustomTheme.textPrimary,

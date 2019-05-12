@@ -63,8 +63,8 @@ class Subtask {
     Duration totalEstimatedDuration = estimatedDuration;
     Duration totalLoggedTime = _calculateTotalLoggedTime();
 
-    double percent = totalLoggedTime.inSeconds / totalEstimatedDuration.inSeconds;
-
-    return (percent.isFinite ? percent : 0) * 100.0;
+    double ratio = totalLoggedTime.inSeconds / totalEstimatedDuration.inSeconds;
+    double percent = (ratio.isFinite ? ratio : 0) * 100.0;
+    return percent > 100 ? 100 : percent;
   }
 }

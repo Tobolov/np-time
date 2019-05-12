@@ -8,8 +8,9 @@ import '../../theme.dart';
 
 class TaskTimerCompletion extends StatefulWidget {
   final Task _task;
+  final int _subtaskindex;
 
-  TaskTimerCompletion(this._task);
+  TaskTimerCompletion(this._task, this._subtaskindex);
 
   @override
   State<StatefulWidget> createState() {
@@ -35,12 +36,12 @@ class _TaskTimerCompletion extends State<TaskTimerCompletion> {
     });
 
     // these calculations can be taxing, cache the result
-    percentExistinglyComplete = widget._task.percentComplete;
+    percentExistinglyComplete = widget._task.subtasks[widget._subtaskindex].percentComplete;
     if (percentExistinglyComplete < 0.1) {
-      taskTotalRemainingSeconds = widget._task.estimatedDuration.inSeconds;
+      taskTotalRemainingSeconds = widget._task.subtasks[widget._subtaskindex].estimatedDuration.inSeconds;
     } else {
       taskTotalRemainingSeconds =
-          (widget._task.estimatedDuration.inSeconds * (1 - percentExistinglyComplete / 100))
+          (widget._task.subtasks[widget._subtaskindex].estimatedDuration.inSeconds * (1 - percentExistinglyComplete / 100))
               .toInt();
     }
   }
@@ -54,6 +55,9 @@ class _TaskTimerCompletion extends State<TaskTimerCompletion> {
   Widget build(BuildContext context) {
     int secondsTimerElapsed = millisecondsElapsed ~/ (1000);
     double taskNewlyCompleteRatio = secondsTimerElapsed / taskTotalRemainingSeconds;
+    if (taskNewlyCompleteRatio.isNaN || taskNewlyCompleteRatio > 1) {
+      taskNewlyCompleteRatio = 1;
+    }
     double taskNewlyCompletePercent = (100 - percentExistinglyComplete) * taskNewlyCompleteRatio;
 
     double totalPercentComplete = percentExistinglyComplete + taskNewlyCompletePercent;

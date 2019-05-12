@@ -236,6 +236,24 @@ class DBProvider {
       }
     }
 
+    // find subtasks which were not removed or added and update them
+    for (Map<String, dynamic> newSubtask in newSubtasksMap) {
+      for (Map<String, dynamic> oldSubtask in oldSubtasksMap) {
+        if (oldSubtask[subtaskId] == newSubtask[subtaskId]) {
+          Map<String, dynamic> updatedSubtaskMap = newSubtask;
+          updatedSubtaskMap[subtaskTaskId] = updatedTask.id;
+          updatedSubtaskMap.remove('loggedTimes');
+          await db.update(
+            '$tableSubtask',
+            updatedSubtaskMap,
+            where: '$subtaskId = ? AND $subtaskTaskId = ?',
+            whereArgs: [updatedSubtaskMap[subtaskId], updatedTask.id],
+          );  
+          break;
+        }
+      }
+    }
+
     var res = await db.update(
       '$tableTask',
       updatedTaskMap,
@@ -255,7 +273,7 @@ class DBProvider {
     // calculate largest id in use
     int j = 0;
     for (LoggedTime loggedTime in updatedSubtask.loggedTimes) {
-        if (j < (loggedTime.id ?? 0)) j = loggedTime.id;
+      if (j < (loggedTime.id ?? 0)) j = loggedTime.id;
     }
 
     // add logged times

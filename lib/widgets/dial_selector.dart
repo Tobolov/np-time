@@ -217,8 +217,8 @@ class _DialSelectorState extends State<DialSelector> {
       ),
       FlatButton(
         child: Text('OK', style: _buildActionTextStyle()),
-        onPressed: () {
-          widget.onSelected(dialValues);
+        onPressed: () async {
+          await widget.onSelected(dialValues);
           Navigator.of(context).pop();
         },
       ),

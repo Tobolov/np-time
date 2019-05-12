@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:grec_minimal/grec_minimal.dart';
+import 'package:np_time/models/logged_time.dart';
 import 'package:np_time/models/subtask.dart';
 import 'package:np_time/models/task.dart';
 import 'package:np_time/bloc/tasks_bloc.dart';
@@ -29,6 +30,7 @@ class _TaskDetailerState extends State<TaskDetailer> {
   @override
   void initState() {
     super.initState();
+
     _task = widget._task;
 
     //listen for changes to task
@@ -75,7 +77,7 @@ class _TaskDetailerState extends State<TaskDetailer> {
         },
       ),
       IconButton(
-        icon: Icon(Icons.delete),
+        icon: Icon(Icons.archive),
         onPressed: () {
           tasksBloc.delete(_task);
           Navigator.pop(context);
@@ -338,16 +340,23 @@ class _TaskDetailerState extends State<TaskDetailer> {
           children: <Widget>[
             Container(
               alignment: Alignment.center,
+              width: 38,
               margin: EdgeInsets.only(right: 16),
-              child: Text(
-                percentCompeleteLabel,
-                style: TextStyle(
-                  fontFamily: 'RobotoCondensed',
-                  fontWeight: FontWeight.w300,
-                  fontSize: 35,
-                  color: CustomTheme.textPrimary,
-                ),
-              ),
+              child: () {
+                if (_task.subtasks[index].percentComplete == 100) {
+                  return Icon(Icons.done, size: 36);
+                } else {
+                  return Text(
+                    percentCompeleteLabel,
+                    style: TextStyle(
+                      fontFamily: 'RobotoCondensed',
+                      fontWeight: FontWeight.w300,
+                      fontSize: 35,
+                      color: CustomTheme.textPrimary,
+                    ),
+                  );
+                }
+              }(),
             ),
             Container(
                 margin: EdgeInsets.symmetric(vertical: 3),
@@ -415,11 +424,50 @@ class _TaskDetailerState extends State<TaskDetailer> {
           children: <Widget>[
             _buildLogTimeItem(Icons.timer, 'Start timer', () {
               Navigator.pop(context);
-              Navigator.pushNamed(context, '/task/timer', arguments: [_task, subtaskIndex]);
+              Navigator.pushNamed(context, '/task/timer',
+                  arguments: [_task, subtaskIndex]);
             }),
-            _buildLogTimeItem(CustomIcons.wrench, 'Log time manually', () {}),
+            _buildLogTimeItem(CustomIcons.wrench, 'Log time manually', () {
+              Navigator.pop(context);
+              showDialog<void>(
+                context: context,
+                barrierDismissible: false, // user must tap button!
+                builder: (BuildContext context) => DialSelector(
+                      title: 'Time to log',
+                      initalDialValues: <int>[0, 0],
+                      onSelected: (List<int> dialValues) async {
+                        Subtask subtask = _task.subtasks[subtaskIndex];
+                        subtask.loggedTimes.add(LoggedTime(
+                          date: DateTime.now(),
+                          timespan: Duration(
+                            hours: dialValues[0],
+                            minutes: dialValues[1],
+                          ),
+                        ));
+                        await tasksBloc.logTime(subtask);
+                        setState(() {});
+                      },
+                      dialTitles: <String>['Hours', 'Minutes'],
+                      dialMaxs: <int>[100, 60],
+                    ),
+              );
+            }),
             _buildLogTimeItem(
-                Icons.done, 'Mark ${isSubtask ? 'sub' : ''}task as complete', () {}),
+              Icons.done,
+              'Mark ${isSubtask ? 'sub' : ''}task as complete',
+              () async {
+                Subtask subtask = _task.subtasks[subtaskIndex];
+                int secondsRemaining = subtask.estimatedDuration.inSeconds -
+                    subtask.totalLoggedTime.inSeconds;
+                subtask.loggedTimes.add(LoggedTime(
+                  date: DateTime.now(),
+                  timespan: Duration(seconds: secondsRemaining),
+                ));
+                await tasksBloc.logTime(subtask);
+                setState(() {});
+                Navigator.pop(context);
+              },
+            ),
           ],
         );
       },

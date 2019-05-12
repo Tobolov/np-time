@@ -16,9 +16,9 @@ import '../../theme.dart';
 
 class TaskTimer extends StatefulWidget {
   final Task _task;
-  final int subtaskIndex;
+  final int _subtaskIndex;
 
-  TaskTimer(this._task, this.subtaskIndex);
+  TaskTimer(this._task, this._subtaskIndex);
 
   @override
   State<StatefulWidget> createState() {
@@ -65,7 +65,7 @@ class _TaskTimerState extends State<TaskTimer> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.stop),
         onPressed: () {
-          Subtask subtask = widget._task.subtasks[widget.subtaskIndex];
+          Subtask subtask = widget._task.subtasks[widget._subtaskIndex];
           subtask.loggedTimes.add(LoggedTime(
             date: DateTime.now(),
             timespan: Duration(milliseconds: stopwatch.elapsedMilliseconds),
@@ -89,14 +89,14 @@ class _TaskTimerState extends State<TaskTimer> {
           DateFormat('d MMM yyyy').format(widget._task.dueDate.toLocal());
       timeRemainingLabel = '${widget._task.dueDateString} ($dateDueString)';
     } else {
-      timeRemainingLabel = widget._task.subtasks[widget.subtaskIndex].name;
+      timeRemainingLabel = widget._task.subtasks[widget._subtaskIndex].name;
     }
 
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          TaskTimerCompletion(widget._task),
+          TaskTimerCompletion(widget._task, widget._subtaskIndex),
           Expanded(
             child: Container(
               child: Column(
@@ -133,7 +133,7 @@ class _TaskTimerState extends State<TaskTimer> {
 //                                  Estimated Time
 //=======================================================================================
   Widget _buildEstimatedTimeRow() {
-    String estimatedDurationLabel = widget._task.estimatedDurationString();
+    String estimatedDurationLabel = widget._task.estimatedDurationString(subtaskIndex: widget._subtaskIndex);
     Color estimatedDurationLabelColor = CustomTheme.textPrimary;
 
     return Row(

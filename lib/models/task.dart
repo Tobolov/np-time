@@ -5,6 +5,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:grec_minimal/grec_minimal.dart';
+import 'package:np_time/models/logged_time.dart';
 
 import './subtask.dart';
 
@@ -129,10 +130,20 @@ class Task {
   }
 
   double _calculatePercentComplete() {
-    Duration totalEstimatedDuration = _calculateEstimatedDuration();
-    Duration totalLoggedTime = _calculateTotalLoggedTime();
+    int totalEstimatedDurationSeconds = 0;
+    int totalLoggedTimeSeconds = 0;
 
-    double ratio = totalLoggedTime.inSeconds / totalEstimatedDuration.inSeconds;
+    for (Subtask subtask in subtasks) {
+      int estimatedDurationSeconds = subtask.estimatedDuration.inSeconds;
+      int loggedTimeSeconds = subtask.totalLoggedTime.inSeconds;
+
+      totalEstimatedDurationSeconds += estimatedDurationSeconds;
+      totalLoggedTimeSeconds += loggedTimeSeconds > estimatedDurationSeconds
+          ? estimatedDurationSeconds
+          : loggedTimeSeconds;
+    }
+
+    double ratio = totalLoggedTimeSeconds / totalEstimatedDurationSeconds;
     double percent = (ratio.isFinite ? ratio : 0) * 100.0;
     double cappedPercent = percent > 100 ? 100 : percent;
     return cappedPercent;

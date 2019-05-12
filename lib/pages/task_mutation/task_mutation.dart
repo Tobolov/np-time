@@ -856,7 +856,7 @@ class _TaskMutationState extends State<TaskMutation> {
       onTap: () {
         _displayEstimatedTimeDialog(context, onSelected: (Duration duration) {
           setState(() => _task.subtasks[index].estimatedDuration = duration);
-        });
+        }, initalDuration: _task.subtasks[index].estimatedDuration);
       },
       child: Row(
         children: <Widget>[
