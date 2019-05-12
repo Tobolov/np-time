@@ -455,7 +455,7 @@ class _TaskDetailerState extends State<TaskDetailer> {
             _buildLogTimeItem(
               Icons.done,
               'Mark ${isSubtask ? 'sub' : ''}task as complete',
-              () async {
+              () async { 
                 Subtask subtask = _task.subtasks[subtaskIndex];
                 int secondsRemaining = subtask.estimatedDuration.inSeconds -
                     subtask.totalLoggedTime.inSeconds;

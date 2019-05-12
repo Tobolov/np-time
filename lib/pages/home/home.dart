@@ -24,6 +24,7 @@ class HomeWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     _context = context;
     return DefaultTabController(
+      initialIndex: 1,
       length: 3,
       child: Scaffold(
         appBar: AppBar(
@@ -56,8 +57,8 @@ class HomeWrapper extends StatelessWidget {
           icon: Icon(Icons.list),
         ),
         Tab(
-          text: 'History',
-          icon: Icon(Icons.history),
+          text: 'Archive',
+          icon: Icon(Icons.archive),
         )
       ],
       onTap: (int tabNum) {

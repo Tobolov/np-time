@@ -51,7 +51,7 @@ class TasksBloc {
   }
 
   delete(Task task) async {
-    task.deleted = true;
+    task.deleted = DateTime.now();
     await edit(task);
   }
 

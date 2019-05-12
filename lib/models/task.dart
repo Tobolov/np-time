@@ -5,6 +5,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:grec_minimal/grec_minimal.dart';
+import 'package:intl/intl.dart';
 import 'package:np_time/models/logged_time.dart';
 
 import './subtask.dart';
@@ -16,7 +17,7 @@ String taskToJson(Task data) => json.encode(data.toMap());
 class Task {
   int id;
   String title;
-  bool deleted;
+  DateTime deleted;
   String description;
   DateTime dueDate;
   RecurrenceRule rRule;
@@ -25,6 +26,7 @@ class Task {
 
   Duration get estimatedDuration => _calculateEstimatedDuration();
   String get dueDateString => _dueDateString();
+  String get dateDeletedString => _dateDeletedString();
   Duration get totalLoggedTime => _calculateTotalLoggedTime();
   double get percentComplete => _calculatePercentComplete();
   bool get isSimple => subtasks[0].name == '__simple__';
@@ -32,7 +34,7 @@ class Task {
   Task({
     this.id,
     @required this.title,
-    this.deleted = false,
+    this.deleted,
     @required this.description,
     @required this.dueDate,
     @required this.rRule,
@@ -46,7 +48,7 @@ class Task {
         notification: <Duration>[],
         rRule: null,
         title: null,
-        deleted: false,
+        deleted: null,
         subtasks: <Subtask>[
           Subtask(
             name: '__simple__',
@@ -58,7 +60,7 @@ class Task {
   factory Task.fromMap(Map<String, dynamic> json) => new Task(
         id: json['id'],
         title: json['title'],
-        deleted: json['deleted'] != 0,
+        deleted: json['deleted'] == '' ? null : DateTime.parse(json['deleted']),
         description: json['description'],
         dueDate: DateTime.parse(json['dueDate']),
         rRule: json['rRule'].toString().length == 0
@@ -79,7 +81,7 @@ class Task {
   Map<String, dynamic> toMap() => {
         'id': id,
         'title': title,
-        'deleted': deleted,
+        'deleted': deleted?.toIso8601String() ?? '',
         'description': description ?? '',
         'dueDate': dueDate.toIso8601String(),
         'rRule': rRule?.asRuleText() ?? '',
@@ -126,6 +128,20 @@ class Task {
       return 'Due tommorow';
     } else {
       return 'Due in $daysRemaining days';
+    }
+  }
+
+  String _dateDeletedString() {
+    int daysAgo = dueDate.difference(DateTime.now()).inDays;
+    if (daysAgo == 0) {
+      return 'Deleted today';
+    } else if (daysAgo == 1) {
+      return 'Deleted yesterday';
+    } else if (daysAgo < 8) {
+      return 'Deleted $daysAgo days ago';
+    } else {
+      String dateDeleted = DateFormat('d MMM yyyy').format(dueDate.toLocal());
+      return 'Deleted ${daysAgo ~/ 7} weeks ago ($dateDeleted)';
     }
   }
 

@@ -160,7 +160,7 @@ class SummaryPage extends StatelessWidget {
   double _calculateHoursRemaining(List<Task> tasks) {
     Duration duration = Duration.zero;
     for (Task task in tasks) {
-      if (task.deleted) continue;
+      if (task.deleted == null) continue;
       duration += task.estimatedDuration;
     }
     return duration.inMinutes / 60;

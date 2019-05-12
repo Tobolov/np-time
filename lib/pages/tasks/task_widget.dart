@@ -7,8 +7,9 @@ import '../../theme.dart';
 class TaskWidget extends StatelessWidget {
   final Task _task;
   final bool _snuffAlerts;
+  final bool _deletedDate;
 
-  TaskWidget(this._task, this._snuffAlerts);
+  TaskWidget(this._task, this._snuffAlerts, this._deletedDate);
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +86,7 @@ class TaskWidget extends StatelessWidget {
               ),
             ),
             Text(
-              _task.dueDateString,
+              _deletedDate ? _task.dueDateString : _task.dueDateString,
               style: TextStyle(
                 fontSize: 12,
                 fontFamily: 'RobotoCondensed',

@@ -64,7 +64,7 @@ class DBProvider {
           CREATE TABLE $tableTask (
             $taskId INTEGER PRIMARY KEY,
             $taskTitle TEXT,
-            $taskDeleted BIT,
+            $taskDeleted TEXT,
             $taskDescription TEXT,
             $taskDueDate TEXT,
             $taskRRule TEXT,

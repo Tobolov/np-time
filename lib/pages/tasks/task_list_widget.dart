@@ -17,6 +17,7 @@ class TasksList extends StatefulWidget {
   final int maxDisplayedTasks;
   final bool snuffAlerts;
   final bool scrollable;
+  final bool showDeleted;
 
   TasksList(
       {@required this.noData,
@@ -24,7 +25,8 @@ class TasksList extends StatefulWidget {
       this.sortingFunction,
       this.maxDisplayedTasks,
       this.snuffAlerts = false,
-      this.scrollable = true});
+      this.scrollable = true,
+      this.showDeleted = false});
 
   @override
   State<StatefulWidget> createState() {
@@ -72,10 +74,10 @@ class _TasksListState extends State<TasksList> {
                 ),
               );
             } else {
-              List<Task> tasks = snapshot.data;
+              List<Task> tasks = List<Task>.from(snapshot.data);
 
               // remove deleted tasks
-              tasks.removeWhere((task) => task.deleted);
+              tasks.removeWhere((task) => (task.deleted == null) == widget.showDeleted);
 
               // filter tasks
               if (widget.searchFilter != null) {
@@ -106,6 +108,16 @@ class _TasksListState extends State<TasksList> {
                 tasks = tasks.sublist(0, maxTasks);
               }
 
+              // if no tasks
+              if (tasks.length == 0) {
+                return Center(
+                  child: Text(
+                    widget.noData,
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              }
+
               if (widget.scrollable) {
                 return Container(
                   margin: EdgeInsets.only(top: 6),
@@ -114,7 +126,7 @@ class _TasksListState extends State<TasksList> {
                     itemCount: tasks.length,
                     itemBuilder: (BuildContext context, int index) {
                       Task task = tasks[index];
-                      return TaskWidget(task, widget.snuffAlerts);
+                      return TaskWidget(task, widget.snuffAlerts, widget.showDeleted);
                     },
                     separatorBuilder: (context, index) {
                       return Container(
@@ -132,7 +144,8 @@ class _TasksListState extends State<TasksList> {
                       List<Widget> widgets = [];
 
                       for (int i = 0; i < tasks.length; i++) {
-                        widgets.add(TaskWidget(tasks[i], widget.snuffAlerts));
+                        widgets.add(
+                            TaskWidget(tasks[i], widget.snuffAlerts, widget.showDeleted));
 
                         // add divider if not last element
                         if (i != tasks.length - 1) {
