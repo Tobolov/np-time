@@ -59,4 +59,10 @@ class MyApp extends StatelessWidget {
       },
     );
   }
+  
+  // todo make notifications work
+  // todo make task repeating work
+  // todo add activity log
+  // todo fix color pallete
+  // todo replace all dividers + text styles with CustomTheme
 }
