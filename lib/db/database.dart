@@ -118,6 +118,8 @@ class DBProvider {
       subtaskMap['taskId'] = id;
       subtaskMap.remove('loggedTimes');
       res += await db.insert('$tableSubtask', subtaskMap);
+
+      await logTime(subtask);
     }
 
     return res;
