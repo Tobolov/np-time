@@ -120,7 +120,7 @@ class Task {
   }
 
   String _dueDateString() {
-    //todo make this a bit better
+    //todo make this a bit better. make util function.
     int daysRemaining = dueDate.difference(DateTime.now()).inDays;
     if (daysRemaining == 0) {
       return 'Due today';

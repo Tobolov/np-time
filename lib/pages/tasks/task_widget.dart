@@ -101,8 +101,6 @@ class TaskWidget extends StatelessWidget {
   }
 
   Widget _buildAlertSector(BuildContext context) {
-    //todo set onTap handlers
-
     double minWidth = 16;
 
     // snuff if disabled
@@ -114,17 +112,37 @@ class TaskWidget extends StatelessWidget {
 
     // task is overdue
     if (_task.dueDate.compareTo(DateTime.now()) < 0) {
+      int daysOverdue = _task.dueDate.difference(DateTime.now()).inDays;
+      String overdueString;
+      if (daysOverdue == 1) {
+        overdueString = '1 day';
+      } else {
+        overdueString = '$daysOverdue days';
+      }
       return _buildAlertButton(
-          icon: Icons.error, color: CustomTheme.errorColor, onTap: () {});
+        icon: Icons.error,
+        color: CustomTheme.errorColor,
+        onTap: () => _displaySnackbar(context, 'Task is overdue by $overdueString'),
+      );
     }
 
     // task due in 3 days
     if (_task.dueDate.compareTo(DateTime.now().add(Duration(days: 3))) < 0) {
+      int daysTillDue = _task.dueDate.difference(DateTime.now()).inDays;
+      String dueInString;
+      if (daysTillDue == 1) {
+        dueInString = 'tommorow';
+      } else {
+        dueInString = 'in $daysTillDue days';
+      }
       return _buildAlertButton(
-          icon: Icons.warning, color: CustomTheme.accent, onTap: () {});
+        icon: Icons.warning,
+        color: CustomTheme.accent,
+        onTap: () => _displaySnackbar(context, 'Task is due $dueInString'),
+      );
     }
 
-    //todo task stale
+    // task stale
     if (_task.subtasks.length >= 1) {
       DateTime lastLoggedTime = DateTime.fromMillisecondsSinceEpoch(0);
       for (Subtask subtask in _task.subtasks) {
@@ -134,14 +152,30 @@ class TaskWidget extends StatelessWidget {
         }
       }
       if (lastLoggedTime.difference(DateTime.now()) > Duration(days: 3)) {
-        // task has not been worked on for 3 days.
+        // task has not been worked on for 3+ days.
+        int daysStale = _task.dueDate.difference(DateTime.now()).inDays;
         return _buildAlertButton(
-            icon: Icons.warning, color: CustomTheme.accent, onTap: () {});
+          icon: Icons.warning,
+          color: CustomTheme.accent,
+          onTap: () => _displaySnackbar(context, 'Task has not been worked on for $daysStale days'),
+        );
       }
     }
     return SizedBox(
       width: minWidth,
     );
+  }
+
+  void _displaySnackbar(BuildContext context, String label) {
+    final snackBar = SnackBar(
+      content: Text(label),
+      duration: Duration(seconds: 4),
+      action: SnackBarAction(
+        label: 'DISMISS',
+        onPressed: () {},
+      ),
+    );
+    Scaffold.of(context).showSnackBar(snackBar);
   }
 
   Widget _buildAlertButton(

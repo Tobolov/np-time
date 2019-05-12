@@ -24,9 +24,6 @@ bool get isInDebugMode {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    if (isInDebugMode) {
-      //DBProvider.db.deleteDB(); //todo REMOVE THIS
-    }
     return MaterialApp(
       //debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -62,6 +59,4 @@ class MyApp extends StatelessWidget {
       },
     );
   }
-
-  //todo dispose all blocs on app close
 }
