@@ -15,7 +15,7 @@ class SummaryPage extends StatelessWidget {
         _buildStatisticsArea(),
         Container(
           margin: EdgeInsets.only(left: 16, top: 16),
-          child: Text('Next 3 tasks due', style: _buildTextStyle()),
+          child: Text('Next 3 tasks due', style: CustomTheme.buildTextStyle()),
         ),
         TasksList(
           noData: 'No tasks exist.',
@@ -50,14 +50,6 @@ class SummaryPage extends StatelessWidget {
     );
   }
 
-  TextStyle _buildTextStyle({Color color, double size}) {
-    return TextStyle(
-      fontSize: size ?? 19,
-      fontFamily: 'RobotoCondensed',
-      fontWeight: FontWeight.w300,
-      color: color ?? CustomTheme.textPrimary,
-    );
-  }
 
 //=======================================================================================
 //                                    Statistics area
@@ -126,20 +118,20 @@ class SummaryPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(title, style: _buildTextStyle()),
+            Text(title, style: CustomTheme.buildTextStyle()),
             SizedBox(
               height: 5,
             ),
             Row(
               children: <Widget>[
-                Text(value, style: _buildTextStyle(size: 30)),
+                Text(value, style: CustomTheme.buildTextStyle(size: 30)),
                 SizedBox(
                   width: 5,
                 ),
                 Expanded(
                   child: Text(
                     valueUnit,
-                    style: _buildTextStyle(
+                    style: CustomTheme.buildTextStyle(
                       size: 30,
                       color: CustomTheme.textDisabled,
                     ),
@@ -189,7 +181,7 @@ class SummaryPage extends StatelessWidget {
           for (LoggedTime loggedTime in subtask.loggedTimes) {
             if (loggedTime.date.difference(DateTime.now()).inDays == daysAgo + 1) {
               daysAgo++;
-              break outerLoop;
+              continue outerLoop;
             }
           }
         }
