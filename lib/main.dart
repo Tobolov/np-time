@@ -32,7 +32,6 @@ class MyApp extends StatelessWidget {
         primaryColor: const Color(0xFF00838F),
         backgroundColor: const Color(0xFF00838F),
         scaffoldBackgroundColor: const Color(0xFF27272F),
-        canvasColor: Colors.transparent
       ),
       routes: {
         '/': (BuildContext context) => HomeWrapper(),

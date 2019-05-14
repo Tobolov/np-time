@@ -18,6 +18,7 @@ class DBProvider {
   final String taskId = 'id';
   final String taskTitle = 'title';
   final String taskDeleted = 'deleted';
+  final String taskCreationDate = 'creationDate';
   final String taskDescription = 'description';
   final String taskDueDate = 'dueDate';
   final String taskRRule = 'rRule';
@@ -65,6 +66,7 @@ class DBProvider {
             $taskId INTEGER PRIMARY KEY,
             $taskTitle TEXT,
             $taskDeleted TEXT,
+            $taskCreationDate TEXT,
             $taskDescription TEXT,
             $taskDueDate TEXT,
             $taskRRule TEXT,
@@ -119,6 +121,9 @@ class DBProvider {
       subtaskMap.remove('loggedTimes');
       res += await db.insert('$tableSubtask', subtaskMap);
 
+      // add logged time
+      subtask.id = subtaskMap['id'];
+      subtask.taskId = subtaskMap['taskId'];
       await logTime(subtask);
     }
 

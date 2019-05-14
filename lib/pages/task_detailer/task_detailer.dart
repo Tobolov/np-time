@@ -9,6 +9,7 @@ import 'package:np_time/bloc/tasks_bloc.dart';
 import 'package:np_time/presentation/custom_icons_icons.dart';
 import 'package:np_time/theme.dart';
 import 'package:intl/intl.dart';
+import 'package:np_time/widgets/activity_log.dart';
 import 'package:np_time/widgets/dial_selector.dart';
 import 'package:np_time/widgets/modal_bottom_sheet.dart';
 
@@ -110,9 +111,10 @@ class _TaskDetailerState extends State<TaskDetailer> {
           }
           return <Widget>[
             _buildSubtasksRow(context),
-            //_buildDivider(context),
           ];
         }(),
+        _buildDivider(context),
+        ActivityLog(_task),
       ],
     );
   }
@@ -455,7 +457,7 @@ class _TaskDetailerState extends State<TaskDetailer> {
             _buildLogTimeItem(
               Icons.done,
               'Mark ${isSubtask ? 'sub' : ''}task as complete',
-              () async { 
+              () async {
                 Subtask subtask = _task.subtasks[subtaskIndex];
                 int secondsRemaining = subtask.estimatedDuration.inSeconds -
                     subtask.totalLoggedTime.inSeconds;

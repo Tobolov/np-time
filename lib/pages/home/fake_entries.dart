@@ -22,6 +22,7 @@ class FakeEntries {
         dueDate: _ahead(5),
         notification: <Duration>[Duration(days: 7), Duration(days: 3)],
         rRule: null,
+        creationDate: _before(39),
         subtasks: <Subtask>[
           Subtask(
             name: 'Analyse data',
@@ -80,6 +81,7 @@ class FakeEntries {
         notification: <Duration>[Duration(days: 3), Duration(days: 1)],
         rRule: RecurrenceRule(Frequency.WEEKLY, null, null, 1,
             Byday([Weekday.values[_ahead(2).weekday]], null)),
+        creationDate: _before(7),
         subtasks: <Subtask>[
           Subtask(
             name: '__simple__',
@@ -96,6 +98,7 @@ class FakeEntries {
         dueDate: _ahead(8),
         notification: <Duration>[Duration(days: 7), Duration(days: 3)],
         rRule: null,
+        creationDate: _before(7),
         subtasks: <Subtask>[
           Subtask(
             name: 'Question 1',
@@ -137,12 +140,13 @@ class FakeEntries {
           Duration(days: 1)
         ],
         rRule: null,
+        creationDate: _before(2),
         subtasks: <Subtask>[
           Subtask(
             name: '__simple__',
             estimatedDuration: Duration(hours: 20),
             loggedTimes: [
-              LoggedTime(date: _before(1), timespan: Duration(hours: 3, minutes: 0)),
+              LoggedTime(date: _before(0), timespan: Duration(hours: 3, minutes: 0)),
               LoggedTime(date: _before(3), timespan: Duration(hours: 0, minutes: 25)),
             ],
           ),
@@ -158,11 +162,14 @@ class FakeEntries {
         notification: <Duration>[Duration(days: 0)],
         rRule: RecurrenceRule(Frequency.MONTHLY, null, null, 1,
             Byday([Weekday.values[_ahead(4).weekday]], _ahead(4).day ~/ 7)),
+        creationDate: _before(31),
         subtasks: <Subtask>[
           Subtask(
             name: '__simple__',
             estimatedDuration: Duration(minutes: 35),
-            loggedTimes: [],
+            loggedTimes: [
+              LoggedTime(date: _before(0), timespan: Duration(hours: 0, minutes: 36)),
+            ],
           ),
         ],
       ),
@@ -175,6 +182,7 @@ class FakeEntries {
         dueDate: _ahead(11),
         notification: <Duration>[Duration(days: 0), Duration(days: 3)],
         rRule: null,
+        creationDate: _before(5),
         subtasks: <Subtask>[
           Subtask(
             name: 'Research Datadog',
@@ -221,6 +229,7 @@ class FakeEntries {
         dueDate: _before(2),
         notification: <Duration>[Duration(days: 1), Duration(days: 3)],
         rRule: null,
+        creationDate: _before(15),
         subtasks: <Subtask>[
           Subtask(
             name: 'Question 1',
@@ -262,6 +271,7 @@ class FakeEntries {
         dueDate: _before(23),
         notification: <Duration>[Duration(days: 1), Duration(days: 3)],
         rRule: null,
+        creationDate: _before(33),
         subtasks: <Subtask>[
           Subtask(
             name: 'Question 1',

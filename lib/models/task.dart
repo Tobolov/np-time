@@ -90,7 +90,7 @@ class Task {
         'deleted': deleted?.toIso8601String() ?? '',
         'description': description ?? '',
         'dueDate': dueDate.toIso8601String(),
-        'creationDate': dueDate.toIso8601String(),
+        'creationDate': creationDate.toIso8601String(),
         'rRule': rRule?.asRuleText() ?? '',
         'notification': List<String>.from(
           notification.map((duration) => duration.inDays.toString()),

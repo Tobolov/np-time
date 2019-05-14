@@ -61,7 +61,7 @@ class _SortingBottomSheetState extends State<SortingBottomSheet> {
                     child: Text(
                       'CANCEL',
                       style: CustomTheme.buildTextStyle(
-                        color: CustomTheme.primaryColor,
+                        color: CustomTheme.secondaryColor,
                       ),
                     ),
                     onPressed: () => Navigator.pop(context),
@@ -71,7 +71,7 @@ class _SortingBottomSheetState extends State<SortingBottomSheet> {
                     child: Text(
                       'DONE',
                       style: CustomTheme.buildTextStyle(
-                        color: CustomTheme.primaryColor,
+                        color: CustomTheme.secondaryColor,
                       ),
                     ),
                     onPressed: () {
@@ -124,7 +124,7 @@ class _SortingBottomSheetState extends State<SortingBottomSheet> {
           value: value,
           onChanged: (value) {},
           groupValue: groupValue,
-          activeColor: CustomTheme.primaryColor,
+          activeColor: CustomTheme.secondaryColor,
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         Expanded(

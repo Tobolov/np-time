@@ -17,8 +17,11 @@ class ActivityLog extends StatefulWidget {
 }
 
 class _ActivityLogState extends State<ActivityLog> {
-  final _weightColorZero = CustomTheme.backgroundColor;
-  final _weightColorMax = CustomTheme.secondary;
+  final Color _weightColorZero = CustomTheme.primaryColor;
+  final Color _weightColorMax = CustomTheme.secondaryColor;
+  final double _gapGridHorizontal = 10;
+  final double _gapGridVertical = 14;
+  final double _gridLabelFontSize = 14;
 
   // logical constants
   List<String> weekdayLabels = ['Mon', 'Tue', 'Wen', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -39,12 +42,25 @@ class _ActivityLogState extends State<ActivityLog> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Text('Activity Log'),
-        ..._buildDataGrid(),
-        _buildLessMoreIndicator(),
-      ],
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(
+              'Activity Log',
+              style: CustomTheme.buildTextStyle(size: 19),
+            ),
+          ),
+          SizedBox(height: 10),
+          ..._buildDataGrid(),
+          SizedBox(height: 10),
+          _buildLessMoreIndicator(),
+          SizedBox(height: 100),
+        ],
+      ),
     );
   }
 
@@ -52,8 +68,14 @@ class _ActivityLogState extends State<ActivityLog> {
 //                                       Shared
 //=======================================================================================
   Color _generateWeightedColor(double weight) {
-    assert(weight > 0 && weight < 1);
+    assert(weight >= 0 && weight <= 1);
     return Color.lerp(_weightColorZero, _weightColorMax, weight);
+  }
+
+  bool _isSameDay(DateTime dateTime1, DateTime dateTime2) {
+    return dateTime1.year == dateTime2.year &&
+        dateTime1.month == dateTime2.month &&
+        dateTime1.day == dateTime2.day;
   }
 
 //=======================================================================================
@@ -63,22 +85,34 @@ class _ActivityLogState extends State<ActivityLog> {
     List<Widget> dataGridRow = [];
 
     // add the headers
-    List<Widget> headerRow = [];
+    List<Widget> headerRow = [Expanded(child: SizedBox())];
     for (String header in weekdayLabels) {
-      headerRow.add(Transform.rotate(
-        angle: -math.pi / 4,
-        child: Text(
-          header,
+      headerRow.add(Expanded(
+        child: Transform.rotate(
+          //alignment: Alignment.centerRight,
+          angle: -math.pi / 4,
+          child: Text(
+            header,
+            textAlign: TextAlign.center,
+            style: CustomTheme.buildTextStyle(
+              color: CustomTheme.textSecondary,
+              size: _gridLabelFontSize,
+            ),
+          ),
         ),
       ));
     }
-    dataGridRow.add(Row(children: headerRow));
+    dataGridRow.add(Padding(
+      padding: EdgeInsets.only(bottom: 15),
+      child: Row(children: headerRow),
+    ));
 
     // calculate rows
+    DateTime creationDateTime = widget._task.creationDateTruncated;
     DateTime currentDateTime = widget._task.creationDateTruncated;
     DateTime dueDateTime = widget._task.dueDateTruncated;
     while (true) {
-      var result = _buildDataRow(currentDateTime, dueDateTime);
+      var result = _buildDataRow(creationDateTime, currentDateTime, dueDateTime);
       dataGridRow.add(result[0] as Widget);
       currentDateTime = result[1] as DateTime;
 
@@ -91,7 +125,8 @@ class _ActivityLogState extends State<ActivityLog> {
   /*
     incoming DateTime's must not container dateframes < day
   */
-  List<dynamic> _buildDataRow(DateTime startDate, DateTime endGridDate) {
+  List<dynamic> _buildDataRow(
+      DateTime creationDate, DateTime startDate, DateTime endGridDate) {
     // calculate endDate
     DateTime endDate = DateTime.fromMillisecondsSinceEpoch(
       startDate.millisecondsSinceEpoch,
@@ -99,30 +134,41 @@ class _ActivityLogState extends State<ActivityLog> {
     String monthHeader = '';
     bool generationComplete = false;
     while (true) {
-      if (endDate.day == 1) monthHeader = monthLabels[endDate.month];
-      if (endDate.weekday == DateTime.sunday) break;
-      if (endDate.isAtSameMomentAs(endGridDate)) {
+      if (_isSameDay(creationDate, endDate)) monthHeader = monthLabels[endDate.month - 1];
+      if (endDate.day == 1) monthHeader = monthLabels[endDate.month - 1];
+      if (_isSameDay(endDate, endGridDate)) {
         generationComplete = true;
         break;
       }
+      if (endDate.weekday == DateTime.sunday) break;
 
       endDate = endDate.add(Duration(days: 1));
     }
 
     // calculate fromDrawDate and endDrawDate
-    DateTime startWeekDate = startDate.subtract(Duration(days: startDate.weekday));
+    DateTime startWeekDate = startDate.subtract(Duration(days: startDate.weekday - 1));
     // add 1 more to make for loop later work
-    DateTime endWeekDate = endDate.add(Duration(days: 6 - startDate.weekday + 1));
+    DateTime endWeekDate = endDate.add(Duration(days: 7 - endDate.weekday + 1));
 
     // create row Widget and add month label
     List<Widget> rowWidgets = [];
-    rowWidgets.add(Text(monthHeader));
+    rowWidgets.add(Expanded(
+      child: Text(
+        monthHeader,
+        style: CustomTheme.buildTextStyle(
+          color: CustomTheme.textSecondary,
+          size: _gridLabelFontSize,
+        ),
+      ),
+    ));
 
     // add month Tiles
     for (DateTime date = startWeekDate;
-        date != endWeekDate;
+        !_isSameDay(date, endWeekDate);
         date = date.add(Duration(days: 1))) {
-      rowWidgets.add(_buildDateCube(date));
+      bool isOutOfTaskBound =
+          date.compareTo(creationDate) < 0 || date.compareTo(endDate) > 0;
+      rowWidgets.add(_buildDateCube(date, isOutOfTaskBound));
     }
 
     // create row with widgets
@@ -130,31 +176,38 @@ class _ActivityLogState extends State<ActivityLog> {
       children: rowWidgets,
     );
 
-    return [builtWidget, endDate, generationComplete];
+    return [builtWidget, endWeekDate.add(Duration(days: 1)), generationComplete];
   }
 
-  Widget _buildDateCube(DateTime dateTime) {
-    double weight = 0; //todo
+  Widget _buildDateCube(DateTime dateTime, bool outOfScope) {
+    double weight = math.Random().nextDouble(); //todo
 
     DateTime today = DateTime.now();
-    bool isSameDay = dateTime.year == today.year &&
-        dateTime.month == today.month &&
-        dateTime.day == today.day;
+    bool isSameDay = _isSameDay(dateTime, today);
+    double borderRadius = isSameDay ? 150 : 0;
 
-    return Container(
-      width: 0, // todo make dynamic from ActivityLog widgets width / 7 etc + for hieght
-      color: _generateWeightedColor(weight),
-      child: Text(
-        dateTime.day.toString(),
-        style: CustomTheme.buildTextStyle(size: 18),
-      ),
-      decoration: BoxDecoration(
-        color: Colors.green,
-        borderRadius: new BorderRadius.only(
-          topLeft: Radius.circular(CustomTheme.borderRadius),
-          topRight: Radius.circular(CustomTheme.borderRadius),
-        ),
-      ),
+    // do not display cube
+    if (outOfScope) {
+      return Expanded(child: SizedBox());
+    }
+
+    return Expanded(
+      child: LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+        return Container(
+          alignment: Alignment.center,
+          height: constraints.minWidth - _gapGridHorizontal,
+          margin: EdgeInsets.symmetric(
+              horizontal: _gapGridHorizontal / 2, vertical: _gapGridVertical / 2),
+          child: Text(
+            dateTime.day.toString(),
+            style: CustomTheme.buildTextStyle(size: 18),
+          ),
+          decoration: BoxDecoration(
+            color: _generateWeightedColor(weight),
+            borderRadius: new BorderRadius.all(Radius.circular(borderRadius)),
+          ),
+        );
+      }),
     );
   }
 
@@ -168,8 +221,10 @@ class _ActivityLogState extends State<ActivityLog> {
   Widget _buildLessMoreIndicator() {
     return Container(
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           _buildLessMoreLabel('Less'),
+          SizedBox(width: 6),
           _buildLessMoreBox(0 / 4),
           _buildLessMoreBox(1 / 4),
           _buildLessMoreBox(2 / 4),
@@ -182,11 +237,12 @@ class _ActivityLogState extends State<ActivityLog> {
   }
 
   Widget _buildLessMoreLabel(String label) {
-    return Text(label, style: CustomTheme.buildTextStyle());
+    return Text(label, style: CustomTheme.buildTextStyle(color: CustomTheme.textSecondary, size: _gridLabelFontSize));
   }
 
   Widget _buildLessMoreBox(double weight) {
     return Container(
+      margin: EdgeInsets.only(right: 6),
       width: 16,
       height: 16,
       color: _generateWeightedColor(weight),

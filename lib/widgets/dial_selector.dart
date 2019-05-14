@@ -150,7 +150,7 @@ class _DialSelectorState extends State<DialSelector> {
           Container(
             height: dividerHeight,
             width: dividerWidth,
-            color: CustomTheme.primaryColor,
+            color: CustomTheme.secondaryColor,
           ),
           Container(
             height: segmentSize,
@@ -158,7 +158,7 @@ class _DialSelectorState extends State<DialSelector> {
           Container(
             height: dividerHeight,
             width: dividerWidth,
-            color: CustomTheme.primaryColor,
+            color: CustomTheme.secondaryColor,
           ),
         ],
       ),
@@ -226,6 +226,6 @@ class _DialSelectorState extends State<DialSelector> {
   }
 
   TextStyle _buildActionTextStyle() {
-    return TextStyle(fontFamily: 'RobotoCondensed', color: CustomTheme.primaryColor);
+    return TextStyle(fontFamily: 'RobotoCondensed', color: CustomTheme.secondaryColor);
   }
 }
