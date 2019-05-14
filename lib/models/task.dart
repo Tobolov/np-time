@@ -20,6 +20,7 @@ class Task {
   DateTime deleted;
   String description;
   DateTime dueDate;
+  DateTime creationDate;
   RecurrenceRule rRule;
   List<Duration> notification;
   List<Subtask> subtasks;
@@ -30,6 +31,8 @@ class Task {
   Duration get totalLoggedTime => _calculateTotalLoggedTime();
   double get percentComplete => _calculatePercentComplete();
   bool get isSimple => subtasks[0].name == '__simple__';
+  DateTime get dueDateTruncated => _truncateDateTime(dueDate);
+  DateTime get creationDateTruncated => _truncateDateTime(creationDate);
 
   Task({
     this.id,
@@ -39,6 +42,7 @@ class Task {
     @required this.dueDate,
     @required this.rRule,
     @required this.notification,
+    @required this.creationDate,
     this.subtasks = const <Subtask>[],
   });
 
@@ -49,6 +53,7 @@ class Task {
         rRule: null,
         title: null,
         deleted: null,
+        creationDate: DateTime.now(),
         subtasks: <Subtask>[
           Subtask(
             name: '__simple__',
@@ -63,6 +68,7 @@ class Task {
         deleted: json['deleted'] == '' ? null : DateTime.parse(json['deleted']),
         description: json['description'],
         dueDate: DateTime.parse(json['dueDate']),
+        creationDate: DateTime.parse(json['creationDate']),
         rRule: json['rRule'].toString().length == 0
             ? null
             : GrecMinimal.fromTexts((<String>[json['rRule']]))[0],
@@ -84,6 +90,7 @@ class Task {
         'deleted': deleted?.toIso8601String() ?? '',
         'description': description ?? '',
         'dueDate': dueDate.toIso8601String(),
+        'creationDate': dueDate.toIso8601String(),
         'rRule': rRule?.asRuleText() ?? '',
         'notification': List<String>.from(
           notification.map((duration) => duration.inDays.toString()),
@@ -196,5 +203,9 @@ class Task {
       subtasks.add(Subtask.empty);
       subtasks[0].name = '__simple__';
     }
+  }
+
+  DateTime _truncateDateTime(DateTime dateTime) {
+    return DateTime(dateTime.year, dateTime.month, dateTime.day);
   }
 }
