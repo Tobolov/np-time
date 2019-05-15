@@ -18,6 +18,7 @@ class TasksList extends StatefulWidget {
   final bool snuffAlerts;
   final bool scrollable;
   final bool showDeleted;
+  final TaskWidgetSwipeBehaviour swipeBehaviour;
 
   TasksList(
       {@required this.noData,
@@ -26,7 +27,8 @@ class TasksList extends StatefulWidget {
       this.maxDisplayedTasks,
       this.snuffAlerts = false,
       this.scrollable = true,
-      this.showDeleted = false});
+      this.showDeleted = false,
+      this.swipeBehaviour = TaskWidgetSwipeBehaviour.None});
 
   @override
   State<StatefulWidget> createState() {
@@ -126,7 +128,7 @@ class _TasksListState extends State<TasksList> {
                     itemCount: tasks.length,
                     itemBuilder: (BuildContext context, int index) {
                       Task task = tasks[index];
-                      return TaskWidget(task, widget.snuffAlerts, widget.showDeleted);
+                      return TaskWidget(task, widget.snuffAlerts, widget.showDeleted, widget.swipeBehaviour);
                     },
                     separatorBuilder: (context, index) {
                       return Container(
@@ -146,7 +148,7 @@ class _TasksListState extends State<TasksList> {
 
                       for (int i = 0; i < tasks.length; i++) {
                         widgets.add(
-                            TaskWidget(tasks[i], widget.snuffAlerts, widget.showDeleted));
+                            TaskWidget(tasks[i], widget.snuffAlerts, widget.showDeleted, widget.swipeBehaviour));
 
                         // add divider if not last element
                         if (i != tasks.length - 1) {

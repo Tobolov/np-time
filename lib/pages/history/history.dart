@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:np_time/pages/tasks/task_list_widget.dart';
+import 'package:np_time/pages/tasks/task_widget.dart';
 
 class HistoryPage extends StatelessWidget {
   @override
@@ -8,6 +9,7 @@ class HistoryPage extends StatelessWidget {
       noData: 'No archived tasks!',
       showDeleted: true,
       snuffAlerts: true,
+      swipeBehaviour: TaskWidgetSwipeBehaviour.Restore,
     );
   }
 }

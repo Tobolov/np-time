@@ -55,6 +55,11 @@ class TasksBloc {
     await edit(task);
   }
 
+  restore(Task task) async {
+    task.deleted = null;
+    await edit(task);
+  }
+
   deleteDatabase() async {
     await DBProvider.db.deleteDB();
     await getTasks();

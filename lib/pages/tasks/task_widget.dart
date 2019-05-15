@@ -7,45 +7,71 @@ import 'package:np_time/models/task.dart';
 import 'package:np_time/pages/task_detailer/log_time.dart';
 import '../../theme.dart';
 
+enum TaskWidgetSwipeBehaviour {
+  None,
+  ArchiveLog,
+  Restore,
+}
+
 class TaskWidget extends StatelessWidget {
   final Task _task;
   final bool _snuffAlerts;
   final bool _deletedDate;
+  final TaskWidgetSwipeBehaviour _swipeBehaviour;
 
-  TaskWidget(this._task, this._snuffAlerts, this._deletedDate);
+  TaskWidget(this._task, this._snuffAlerts, this._deletedDate, this._swipeBehaviour);
 
   @override
   Widget build(BuildContext context) {
-    return Dismissible(
-      key: Key(_task.id.toString()),
-      child: _buildTaskWidgetBody(context),
-      direction: DismissDirection.horizontal,
-      background: _buildTaskDissmissableBackground(
-          'Archive', CustomTheme.errorColor, Icons.archive, MainAxisAlignment.start),
-      secondaryBackground: _buildTaskDissmissableBackground(
-          'Log Time', CustomTheme.accent, Icons.timer, MainAxisAlignment.end),
-      confirmDismiss: (direction) async {
-        // only dissmiss if deleting
-        if (direction == DismissDirection.startToEnd) {
-          return true;
-        }
-        // log time to task
-        if (direction == DismissDirection.endToStart) {
-          displayLogTimeDialogForUnkownSubtask(context, _task);
+    if (_swipeBehaviour == TaskWidgetSwipeBehaviour.None) {
+      return _buildTaskWidgetBody(context);
+    }
+    if (_swipeBehaviour == TaskWidgetSwipeBehaviour.ArchiveLog) {
+      return Dismissible(
+        key: Key(_task.id.toString()),
+        child: _buildTaskWidgetBody(context),
+        direction: DismissDirection.horizontal,
+        background: _buildTaskDissmissableBackground(
+            'Archive', CustomTheme.errorColor, Icons.archive, MainAxisAlignment.start),
+        secondaryBackground: _buildTaskDissmissableBackground(
+            'Log Time', CustomTheme.accent, Icons.timer, MainAxisAlignment.end),
+        confirmDismiss: (direction) async {
+          // only dissmiss if deleting
+          if (direction == DismissDirection.startToEnd) {
+            return true;
+          }
+          // log time to task
+          if (direction == DismissDirection.endToStart) {
+            displayLogTimeDialogForUnkownSubtask(context, _task);
+            return false;
+          }
           return false;
-        } 
-        return false;
-      },
-      onDismissed: (direction) {
-        // delete the task
-        if (direction == DismissDirection.startToEnd) {
-          tasksBloc.delete(_task);
+        },
+        onDismissed: (direction) {
+          // delete the task
+          if (direction == DismissDirection.startToEnd) {
+            tasksBloc.delete(_task);
 
-          //todo replace with undo
-          Scaffold.of(context).showSnackBar(SnackBar(content: Text("item dismissed")));
-        }
-      },
-    );
+            //todo replace with undo
+            Scaffold.of(context).showSnackBar(SnackBar(content: Text("item dismissed")));
+          }
+        },
+      );
+    }
+    if (_swipeBehaviour == TaskWidgetSwipeBehaviour.Restore) {
+      return Dismissible(
+        key: Key(_task.id.toString()),
+        child: _buildTaskWidgetBody(context),
+        direction: DismissDirection.endToStart,
+        background: _buildTaskDissmissableBackground(
+            'Restore', CustomTheme.green, Icons.restore, MainAxisAlignment.start),
+        secondaryBackground: _buildTaskDissmissableBackground(
+            'Restore', CustomTheme.green, Icons.restore, MainAxisAlignment.end),
+        onDismissed: (direction) {
+          tasksBloc.restore(_task);
+        },
+      );
+    }
   }
 
   Widget _buildTaskDissmissableBackground(
