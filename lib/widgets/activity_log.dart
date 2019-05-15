@@ -22,6 +22,7 @@ class _ActivityLogState extends State<ActivityLog> {
   final double _gapGridHorizontal = 10;
   final double _gapGridVertical = 14;
   final double _gridLabelFontSize = 14;
+  final double _maxMinutesInDayTile = 4 * 60.0;
 
   // logical constants
   List<String> weekdayLabels = ['Mon', 'Tue', 'Wen', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -176,11 +177,25 @@ class _ActivityLogState extends State<ActivityLog> {
       children: rowWidgets,
     );
 
-    return [builtWidget, endWeekDate.add(Duration(days: 1)), generationComplete];
+    return [builtWidget, endWeekDate, generationComplete];
+  }
+
+  double lerpDouble(num a, num b, double t) {
+    if (a == null && b == null) return null;
+    a ??= 0.0;
+    b ??= 0.0;
+    return a + (b - a) * t;
   }
 
   Widget _buildDateCube(DateTime dateTime, bool outOfScope) {
-    double weight = math.Random().nextDouble(); //todo
+    double weight = lerpDouble(
+      0,
+      1,
+      math.min(
+        _maxMinutesInDayTile,
+        widget._task.calculateTotalLoggedTimeOnDate(dateTime).inMinutes.toDouble(),
+      ) / _maxMinutesInDayTile,
+    );
 
     DateTime today = DateTime.now();
     bool isSameDay = _isSameDay(dateTime, today);
@@ -237,7 +252,9 @@ class _ActivityLogState extends State<ActivityLog> {
   }
 
   Widget _buildLessMoreLabel(String label) {
-    return Text(label, style: CustomTheme.buildTextStyle(color: CustomTheme.textSecondary, size: _gridLabelFontSize));
+    return Text(label,
+        style: CustomTheme.buildTextStyle(
+            color: CustomTheme.textSecondary, size: _gridLabelFontSize));
   }
 
   Widget _buildLessMoreBox(double weight) {

@@ -208,4 +208,18 @@ class Task {
   DateTime _truncateDateTime(DateTime dateTime) {
     return DateTime(dateTime.year, dateTime.month, dateTime.day);
   }
+
+  Duration calculateTotalLoggedTimeOnDate(DateTime date) {
+    int totalSeconds = 0;
+    for (Subtask subtask in subtasks) {
+      for (LoggedTime loggedTime in subtask.loggedTimes) {
+        if (loggedTime.date.year == date.year &&
+            loggedTime.date.month == date.month &&
+            loggedTime.date.day == date.day) {
+              totalSeconds += loggedTime.timespan.inSeconds;
+            }
+      }
+    }
+    return Duration(seconds: totalSeconds);
+  }
 }

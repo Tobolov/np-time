@@ -80,7 +80,7 @@ class FakeEntries {
         dueDate: _ahead(2),
         notification: <Duration>[Duration(days: 3), Duration(days: 1)],
         rRule: RecurrenceRule(Frequency.WEEKLY, null, null, 1,
-            Byday([Weekday.values[_ahead(2).weekday]], null)),
+            Byday([Weekday.values[_ahead(2).weekday - 1]], null)),
         creationDate: _before(7),
         subtasks: <Subtask>[
           Subtask(
@@ -161,14 +161,14 @@ class FakeEntries {
         dueDate: _ahead(4),
         notification: <Duration>[Duration(days: 0)],
         rRule: RecurrenceRule(Frequency.MONTHLY, null, null, 1,
-            Byday([Weekday.values[_ahead(4).weekday]], _ahead(4).day ~/ 7)),
+            Byday([Weekday.values[_ahead(4).weekday - 1]], _ahead(4).day ~/ 7)),
         creationDate: _before(31),
         subtasks: <Subtask>[
           Subtask(
             name: '__simple__',
             estimatedDuration: Duration(minutes: 35),
             loggedTimes: [
-              LoggedTime(date: _before(0), timespan: Duration(hours: 0, minutes: 36)),
+              LoggedTime(date: _before(3), timespan: Duration(hours: 0, minutes: 36)),
             ],
           ),
         ],
