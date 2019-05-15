@@ -23,6 +23,14 @@ class HomeWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _context = context;
+    homeBloc.updateFab(
+      ApplicationFab(
+        icon: Icons.add,
+        onPressed: () {
+          Navigator.pushNamed(context, '/task/create');
+        },
+      ),
+    );
     return DefaultTabController(
       initialIndex: 1,
       length: 3,

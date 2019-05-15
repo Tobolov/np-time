@@ -12,7 +12,7 @@ class HomeFloatingActionButton extends StatefulWidget {
 class _HomeFloatingActionButtonState extends State<HomeFloatingActionButton> {
   Function _onPressed;
   Icon _icon;
-  double _opacity = 0.0;
+  double _opacity = 1.0;
 
   _HomeFloatingActionButtonState() {
     homeBloc.applicationFabs.listen(

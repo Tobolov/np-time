@@ -3,7 +3,7 @@ import 'package:rxdart/rxdart.dart';
 
 class HomeBloc {
   final _searchQueries = PublishSubject<String>();
-  final _applicationFab = PublishSubject<ApplicationFab>();
+  final _applicationFab = BehaviorSubject<ApplicationFab>();
 
   Observable<String> get searchQueries => _searchQueries.stream;
   Observable<ApplicationFab> get applicationFabs => _applicationFab.stream;
