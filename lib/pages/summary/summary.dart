@@ -182,7 +182,7 @@ class SummaryPage extends StatelessWidget {
         nowDiff = now.subtract(Duration(days: daysAgo + 1));
         for (Subtask subtask in task.subtasks) {
           for (LoggedTime loggedTime in subtask.loggedTimes) {
-            if (loggedTime.date.compareTo(nowDiff) > 0) {
+            if (loggedTime.date.isAfter(nowDiff)) {
               daysAgo++;
               continue outerLoop;
             }

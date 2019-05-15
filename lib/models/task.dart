@@ -129,7 +129,11 @@ class Task {
   String _dueDateString() {
     //todo make this a bit better. make util function.
     int daysRemaining = dueDate.difference(DateTime.now()).inDays;
-    if (daysRemaining == 0) {
+    if (daysRemaining == -1) {
+      return 'Due yesterday';
+    } else if (daysRemaining < -1) {
+      return 'Due ${-1 * daysRemaining} days ago';
+    } if (daysRemaining == 0) {
       return 'Due today';
     } else if (daysRemaining == 1) {
       return 'Due tommorow';

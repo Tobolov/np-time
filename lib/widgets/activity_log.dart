@@ -112,6 +112,13 @@ class _ActivityLogState extends State<ActivityLog> {
     DateTime creationDateTime = widget._task.creationDateTruncated;
     DateTime currentDateTime = widget._task.creationDateTruncated;
     DateTime dueDateTime = widget._task.dueDateTruncated;
+
+    // set drawn due date to today (truncated without time) if overdue
+    DateTime dateTimeNow = DateTime.now();
+    if (dueDateTime.isBefore(dateTimeNow)) {
+      dueDateTime = DateTime(dateTimeNow.year, dateTimeNow.month, dateTimeNow.day);
+    }
+
     while (true) {
       var result = _buildDataRow(creationDateTime, currentDateTime, dueDateTime);
       dataGridRow.add(result[0] as Widget);
@@ -168,7 +175,7 @@ class _ActivityLogState extends State<ActivityLog> {
         !_isSameDay(date, endWeekDate);
         date = date.add(Duration(days: 1))) {
       bool isOutOfTaskBound =
-          date.compareTo(creationDate) < 0 || date.compareTo(endDate) > 0;
+          date.isBefore(creationDate) || date.isAfter(endDate);
       rowWidgets.add(_buildDateCube(date, isOutOfTaskBound));
     }
 

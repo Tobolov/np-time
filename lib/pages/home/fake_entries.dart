@@ -15,6 +15,27 @@ class FakeEntries {
 
   static void addEntries() {
     tasksBloc.addBatch(<Task>[
+      // 
+      Task(
+        title: 'Catchup on MATH1052 Lectures',
+        description:
+            'Catchup on the last 2 MATH1052 lectures.',
+        dueDate: _before(3),
+        notification: <Duration>[Duration(days: 1)],
+        rRule: null,
+        creationDate: _before(7),
+        subtasks: <Subtask>[
+          Subtask(
+            name: '__simple__',
+            estimatedDuration: Duration(hours: 3),
+            loggedTimes: [
+              LoggedTime(date: _before(2), timespan: Duration(hours: 1, minutes: 20)),
+              LoggedTime(date: _before(4), timespan: Duration(hours: 1, minutes: 20)),
+            ],
+          ),
+        ],
+      ),
+
       // DECO2500 assignment
       Task(
         title: 'DECO2500 Assignment Report 3',
@@ -217,6 +238,24 @@ class FakeEntries {
           Subtask(
             name: 'Implement system architecture',
             estimatedDuration: Duration(hours: 25),
+            loggedTimes: [],
+          ),
+        ],
+      ),
+
+      Task(
+        title: 'Weekly Chill Time',
+        description:
+            'Keep track of your cooldown time for the week.',
+        dueDate: _ahead(6),
+        notification: <Duration>[],
+        rRule: RecurrenceRule(Frequency.WEEKLY, null, null, 1,
+            Byday([Weekday.values[_ahead(6).weekday - 1]], null)),
+        creationDate: _before(1),
+        subtasks: <Subtask>[
+          Subtask(
+            name: '__simple__',
+            estimatedDuration: Duration(hours: 6),
             loggedTimes: [],
           ),
         ],
