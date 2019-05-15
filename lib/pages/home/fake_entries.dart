@@ -67,6 +67,7 @@ class FakeEntries {
             loggedTimes: [
               LoggedTime(date: _before(7), timespan: Duration(hours: 8, minutes: 0)),
               LoggedTime(date: _before(5), timespan: Duration(hours: 0, minutes: 30)),
+              LoggedTime(date: _before(2), timespan: Duration(hours: 0, minutes: 10)),
             ],
           ),
         ],
@@ -147,7 +148,7 @@ class FakeEntries {
             estimatedDuration: Duration(hours: 20),
             loggedTimes: [
               LoggedTime(date: _before(0), timespan: Duration(hours: 3, minutes: 0)),
-              LoggedTime(date: _before(3), timespan: Duration(hours: 0, minutes: 25)),
+              LoggedTime(date: _before(1), timespan: Duration(hours: 0, minutes: 25)),
             ],
           ),
         ],
@@ -162,7 +163,7 @@ class FakeEntries {
         notification: <Duration>[Duration(days: 0)],
         rRule: RecurrenceRule(Frequency.MONTHLY, null, null, 1,
             Byday([Weekday.values[_ahead(4).weekday - 1]], _ahead(4).day ~/ 7)),
-        creationDate: _before(31),
+        creationDate: _before(5),
         subtasks: <Subtask>[
           Subtask(
             name: '__simple__',

@@ -173,13 +173,16 @@ class SummaryPage extends StatelessWidget {
   }
 
   int _calculateTaskStreak(List<Task> tasks) {
+    DateTime now = DateTime.now();
+    DateTime nowDiff;
     int daysAgo = 0;
     while (true) {
       outerLoop:
       for (Task task in tasks) {
+        nowDiff = now.subtract(Duration(days: daysAgo + 1));
         for (Subtask subtask in task.subtasks) {
           for (LoggedTime loggedTime in subtask.loggedTimes) {
-            if (loggedTime.date.difference(DateTime.now()).inDays == daysAgo + 1) {
+            if (loggedTime.date.compareTo(nowDiff) > 0) {
               daysAgo++;
               continue outerLoop;
             }
