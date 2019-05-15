@@ -166,15 +166,6 @@ class _TaskMutationState extends State<TaskMutation> {
 //                                    Shared
 //=======================================================================================
 
-  TextStyle _buildTextStyle(BuildContext context, {Color color}) {
-    return TextStyle(
-      fontSize: 19,
-      fontFamily: 'RobotoCondensed',
-      fontWeight: FontWeight.w300,
-      color: color ?? CustomTheme.textPrimary,
-    );
-  }
-
   TextStyle _buildErrorTextStyle() {
     return TextStyle(
       fontSize: 12,
@@ -250,7 +241,7 @@ class _TaskMutationState extends State<TaskMutation> {
           Expanded(
             child: TextFormField(
               initialValue: _task.description ?? '',
-              style: _buildTextStyle(context),
+              style: CustomTheme.buildTextStyle(),
               minLines: 1,
               maxLines: 6,
               decoration: InputDecoration(
@@ -293,7 +284,7 @@ class _TaskMutationState extends State<TaskMutation> {
                   _task.dueDate != null
                       ? DateFormat('EEE, d MMM yyyy').format(_task.dueDate.toLocal())
                       : 'Set due date',
-                  style: _buildTextStyle(context),
+                  style: CustomTheme.buildTextStyle(),
                 ),
               ),
             ),
@@ -383,7 +374,7 @@ class _TaskMutationState extends State<TaskMutation> {
               Expanded(
                 child: Text(
                   notificaitonLabel,
-                  style: _buildTextStyle(context),
+                  style: CustomTheme.buildTextStyle(),
                 ),
               ),
               InkWell(
@@ -531,7 +522,7 @@ class _TaskMutationState extends State<TaskMutation> {
                 padding: EdgeInsets.symmetric(vertical: 6),
                 child: Text(
                   _task.rRule != null ? _verbaliseRRule(_task.rRule) : 'Does not repeat',
-                  style: _buildTextStyle(context),
+                  style: CustomTheme.buildTextStyle(),
                 ),
               ),
             ),
@@ -625,19 +616,19 @@ class _TaskMutationState extends State<TaskMutation> {
               targetRule: RecurrenceRule(Frequency.DAILY, 365 * 100, null, 1, null),
             ),
             _buildRepeatOption(
-              title: 'Every week on ${weekdayMap[_task.dueDate.weekday - 1]}',
+              title: 'Every week on ${weekdayMap[_task.dueDate.weekday]}',
               targetRule: RecurrenceRule(Frequency.WEEKLY, 365 * 100, null, 1,
-                  Byday(<Weekday>[Weekday.values[_task.dueDate.weekday - 1]], null)),
+                  Byday(<Weekday>[Weekday.values[_task.dueDate.weekday]], null)),
             ),
             _buildRepeatOption(
               title:
-                  'Every month on the ${_stringifyNumber((_task.dueDate.day - 1) ~/ 7)} ${weekdayMap[_task.dueDate.weekday - 1]}',
+                  'Every month on the ${_stringifyNumber((_task.dueDate.day - 1) ~/ 7)} ${weekdayMap[_task.dueDate.weekday]}',
               targetRule: RecurrenceRule(
                 Frequency.MONTHLY,
                 365 * 100,
                 null,
                 1,
-                Byday(<Weekday>[Weekday.values[_task.dueDate.weekday - 1]],
+                Byday(<Weekday>[Weekday.values[_task.dueDate.weekday]],
                     (_task.dueDate.day - 1) ~/ 7),
               ),
             ),
@@ -709,7 +700,7 @@ class _TaskMutationState extends State<TaskMutation> {
                 padding: EdgeInsets.symmetric(vertical: 6),
                 child: Text(
                   estimatedDurationLabel,
-                  style: _buildTextStyle(context, color: estimatedDurationLabelColor),
+                  style: CustomTheme.buildTextStyle(color: estimatedDurationLabelColor),
                 ),
               ),
             ),
@@ -822,7 +813,7 @@ class _TaskMutationState extends State<TaskMutation> {
           padding: EdgeInsets.only(bottom: 6),
           child: TextFormField(
             initialValue: _task.subtasks[index].name ?? '',
-            style: _buildTextStyle(context),
+            style: CustomTheme.buildTextStyle(),
             minLines: 1,
             maxLines: 3,
             decoration: InputDecoration(
@@ -870,7 +861,7 @@ class _TaskMutationState extends State<TaskMutation> {
           Expanded(
             child: Text(
               estimatedDurationLabel,
-              style: _buildTextStyle(context),
+              style: CustomTheme.buildTextStyle(),
             ),
           ),
         ],

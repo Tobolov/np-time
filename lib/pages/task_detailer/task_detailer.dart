@@ -123,15 +123,6 @@ class _TaskDetailerState extends State<TaskDetailer> {
 //                                    Shared
 //=======================================================================================
 
-  TextStyle _buildTextStyle(BuildContext context, {Color color}) {
-    return TextStyle(
-      fontSize: 19,
-      fontFamily: 'RobotoCondensed',
-      fontWeight: FontWeight.w300,
-      color: color ?? CustomTheme.textPrimary,
-    );
-  }
-
   Widget _buildDivider(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16),
@@ -263,7 +254,7 @@ class _TaskDetailerState extends State<TaskDetailer> {
           Expanded(
             child: Text(
               _task.description,
-              style: _buildTextStyle(context),
+              style: CustomTheme.buildTextStyle(),
               maxLines: 6,
             ),
           ),
@@ -292,7 +283,7 @@ class _TaskDetailerState extends State<TaskDetailer> {
               padding: EdgeInsets.symmetric(vertical: 6),
               child: Text(
                 estimatedDurationLabel,
-                style: _buildTextStyle(context, color: estimatedDurationLabelColor),
+                style: CustomTheme.buildTextStyle(color: estimatedDurationLabelColor),
               ),
             ),
           ),
@@ -315,7 +306,7 @@ class _TaskDetailerState extends State<TaskDetailer> {
               margin: EdgeInsets.only(top: 16, left: 16),
               child: Text(
                 'Subtasks',
-                style: _buildTextStyle(context, color: CustomTheme.textSecondary),
+                style: CustomTheme.buildTextStyle(color: CustomTheme.textSecondary),
               ),
             )
           ];
@@ -391,7 +382,7 @@ class _TaskDetailerState extends State<TaskDetailer> {
                         Expanded(
                           child: Text(
                             _task.estimatedDurationString(subtaskIndex: index),
-                            style: _buildTextStyle(context,
+                            style: CustomTheme.buildTextStyle(
                                 color: CustomTheme.textSecondary),
                           ),
                         ),
