@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:np_time/widgets/activity_log.dart';
 import 'package:np_time/widgets/dial_selector.dart';
 import 'package:np_time/widgets/modal_bottom_sheet.dart';
+import 'package:np_time/pages/task_detailer/log_time.dart';
 
 class TaskDetailer extends StatefulWidget {
   final Task _task;
@@ -62,7 +63,7 @@ class _TaskDetailerState extends State<TaskDetailer> {
           ? FloatingActionButton(
               child: Icon(Icons.timer),
               onPressed: () {
-                _displayLogTimeDialog(context, 0, false);
+                displayLogTimeDialog(context, 0, false, _task, onSelected: () => setState(() {}));
               },
             )
           : null,
@@ -395,7 +396,7 @@ class _TaskDetailerState extends State<TaskDetailer> {
             IconButton(
               icon: Icon(Icons.timer),
               onPressed: () {
-                _displayLogTimeDialog(context, index, true);
+                displayLogTimeDialog(context, index, true, _task, onSelected: () => setState(() {}));
               },
             )
           ],
@@ -407,71 +408,5 @@ class _TaskDetailerState extends State<TaskDetailer> {
 //=======================================================================================
 //                                    Log Time
 //=======================================================================================
-  void _displayLogTimeDialog(BuildContext context, int subtaskIndex, bool isSubtask) {
-    showModalBottomSheetApp<void>(
-      context: context,
-      dismissOnTap: true,
-      builder: (BuildContext context1) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            _buildLogTimeItem(Icons.timer, 'Start timer', () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, '/task/timer',
-                  arguments: [_task, subtaskIndex]);
-            }),
-            _buildLogTimeItem(CustomIcons.wrench, 'Log time manually', () {
-              Navigator.pop(context);
-              showDialog<void>(
-                context: context,
-                barrierDismissible: false, // user must tap button!
-                builder: (BuildContext context) => DialSelector(
-                      title: 'Time to log',
-                      initalDialValues: <int>[0, 0],
-                      onSelected: (List<int> dialValues) async {
-                        Subtask subtask = _task.subtasks[subtaskIndex];
-                        subtask.loggedTimes.add(LoggedTime(
-                          date: DateTime.now(),
-                          timespan: Duration(
-                            hours: dialValues[0],
-                            minutes: dialValues[1],
-                          ),
-                        ));
-                        await tasksBloc.logTime(subtask);
-                        setState(() {});
-                      },
-                      dialTitles: <String>['Hours', 'Minutes'],
-                      dialMaxs: <int>[100, 60],
-                    ),
-              );
-            }),
-            _buildLogTimeItem(
-              Icons.done,
-              'Mark ${isSubtask ? 'sub' : ''}task as complete',
-              () async {
-                Subtask subtask = _task.subtasks[subtaskIndex];
-                int secondsRemaining = subtask.estimatedDuration.inSeconds -
-                    subtask.totalLoggedTime.inSeconds;
-                subtask.loggedTimes.add(LoggedTime(
-                  date: DateTime.now(),
-                  timespan: Duration(seconds: secondsRemaining),
-                ));
-                await tasksBloc.logTime(subtask);
-                setState(() {});
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildLogTimeItem(IconData icon, String title, Function onTap) {
-    return ListTile(
-      leading: Icon(icon, color: CustomTheme.textPrimary),
-      title: Text(title, style: CustomTheme.buildTextStyle()),
-      onTap: onTap,
-    );
-  }
+  
 }

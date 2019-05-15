@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:np_time/bloc/tasks_bloc.dart';
 import 'package:np_time/models/logged_time.dart';
 import 'package:np_time/models/subtask.dart';
 import 'package:np_time/models/task.dart';
+import 'package:np_time/pages/task_detailer/log_time.dart';
 import '../../theme.dart';
 
 class TaskWidget extends StatelessWidget {
@@ -13,6 +16,60 @@ class TaskWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Dismissible(
+      key: Key(_task.id.toString()),
+      child: _buildTaskWidgetBody(context),
+      direction: DismissDirection.horizontal,
+      background: _buildTaskDissmissableBackground(
+          'Archive', CustomTheme.errorColor, Icons.archive, MainAxisAlignment.start),
+      secondaryBackground: _buildTaskDissmissableBackground(
+          'Log Time', CustomTheme.accent, Icons.timer, MainAxisAlignment.end),
+      confirmDismiss: (direction) async {
+        // only dissmiss if deleting
+        if (direction == DismissDirection.startToEnd) {
+          return true;
+        }
+        // log time to task
+        if (direction == DismissDirection.endToStart) {
+          displayLogTimeDialogForUnkownSubtask(context, _task);
+          return false;
+        } 
+        return false;
+      },
+      onDismissed: (direction) {
+        // delete the task
+        if (direction == DismissDirection.startToEnd) {
+          tasksBloc.delete(_task);
+
+          //todo replace with undo
+          Scaffold.of(context).showSnackBar(SnackBar(content: Text("item dismissed")));
+        }
+      },
+    );
+  }
+
+  Widget _buildTaskDissmissableBackground(
+      String label, Color color, IconData icon, MainAxisAlignment mainAxisAlignment) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      color: color,
+      child: Row(
+        mainAxisAlignment: mainAxisAlignment,
+        children: () {
+          var widgets = <Widget>[
+            Text(label, style: CustomTheme.buildTextStyle(weight: FontWeight.w400)),
+            SizedBox(width: 16),
+            Icon(icon),
+          ];
+          return mainAxisAlignment == MainAxisAlignment.end
+              ? widgets
+              : widgets.reversed.toList();
+        }(),
+      ),
+    );
+  }
+
+  Widget _buildTaskWidgetBody(BuildContext context) {
     return InkWell(
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 8),
@@ -157,7 +214,8 @@ class TaskWidget extends StatelessWidget {
         return _buildAlertButton(
           icon: Icons.warning,
           color: CustomTheme.accent,
-          onTap: () => _displaySnackbar(context, 'Task has not been worked on for $daysStale days'),
+          onTap: () => _displaySnackbar(
+              context, 'Task has not been worked on for $daysStale days'),
         );
       }
     }
