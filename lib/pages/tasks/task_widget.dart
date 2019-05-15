@@ -86,7 +86,7 @@ class TaskWidget extends StatelessWidget {
               ),
             ),
             Text(
-              _deletedDate ? _task.dueDateString : _task.dueDateString,
+              _deletedDate ? _task.dateDeletedString : _task.dueDateString,
               style: TextStyle(
                 fontSize: 13,
                 fontFamily: 'RobotoCondensed',
