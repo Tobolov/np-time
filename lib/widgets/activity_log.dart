@@ -49,10 +49,13 @@ class _ActivityLogState extends State<ActivityLog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.symmetric(vertical: 16),
             child: Text(
               'Activity Log',
-              style: CustomTheme.buildTextStyle(size: 19),
+              style: CustomTheme.buildTextStyle(
+                size: 19,
+                color: CustomTheme.textPrimary,
+              ),
             ),
           ),
           SizedBox(height: 10),
@@ -174,8 +177,7 @@ class _ActivityLogState extends State<ActivityLog> {
     for (DateTime date = startWeekDate;
         !_isSameDay(date, endWeekDate);
         date = date.add(Duration(days: 1))) {
-      bool isOutOfTaskBound =
-          date.isBefore(creationDate) || date.isAfter(endDate);
+      bool isOutOfTaskBound = date.isBefore(creationDate) || date.isAfter(endDate);
       rowWidgets.add(_buildDateCube(date, isOutOfTaskBound));
     }
 
@@ -199,9 +201,10 @@ class _ActivityLogState extends State<ActivityLog> {
       0,
       1,
       math.min(
-        _maxMinutesInDayTile,
-        widget._task.calculateTotalLoggedTimeOnDate(dateTime).inMinutes.toDouble(),
-      ) / _maxMinutesInDayTile,
+            _maxMinutesInDayTile,
+            widget._task.calculateTotalLoggedTimeOnDate(dateTime).inMinutes.toDouble(),
+          ) /
+          _maxMinutesInDayTile,
     );
 
     DateTime today = DateTime.now();

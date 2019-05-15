@@ -50,38 +50,41 @@ class _SortingBottomSheetState extends State<SortingBottomSheet> {
           ),
           _buildSortingOrderOption(label: 'Ascending', sortOrder: SortOrder.Ascending),
           _buildSortingOrderOption(label: 'Descending', sortOrder: SortOrder.Descending),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Padding(
-              padding: EdgeInsets.only(right: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  FlatButton(
-                    child: Text(
-                      'CANCEL',
-                      style: CustomTheme.buildTextStyle(
-                        color: CustomTheme.secondaryColor,
-                      ),
+          Padding(
+            padding: EdgeInsets.only(right: 8, top: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                FlatButton(
+                  child: Text(
+                    'CANCEL',
+                    style: CustomTheme.buildTextStyle(
+                      color: CustomTheme.secondaryColor,
                     ),
-                    onPressed: () => Navigator.pop(context),
                   ),
-                  SizedBox(width: 16),
-                  FlatButton(
-                    child: Text(
-                      'DONE',
-                      style: CustomTheme.buildTextStyle(
-                        color: CustomTheme.secondaryColor,
-                      ),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                SizedBox(width: 16),
+                Container(
+                  color: CustomTheme.textDisabled,
+                  width: 0.7,
+                  height: 20,
+                ),
+                SizedBox(width: 16),
+                FlatButton(
+                  child: Text(
+                    'DONE',
+                    style: CustomTheme.buildTextStyle(
+                      color: CustomTheme.secondaryColor,
                     ),
-                    onPressed: () {
-                      tasksBloc.setSortBy(radioSortingMethodOption);
-                      tasksBloc.setSortOrder(radioSortingOrderOption);
-                      Navigator.pop(context);
-                    },
                   ),
-                ],
-              ),
+                  onPressed: () {
+                    tasksBloc.setSortBy(radioSortingMethodOption);
+                    tasksBloc.setSortOrder(radioSortingOrderOption);
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
             ),
           ),
         ],

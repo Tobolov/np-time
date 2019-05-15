@@ -67,14 +67,11 @@ class _TaskMutationState extends State<TaskMutation> {
           child: TextFormField(
             key: _titleKey,
             initialValue: _task.title ?? '',
-            style: TextStyle(
-              fontSize: 25,
-              fontFamily: 'RobotoCondensed',
-              fontWeight: FontWeight.w300,
-            ),
+            style: CustomTheme.buildTextStyle(size: 25),
             decoration: InputDecoration(
               border: InputBorder.none,
               hintText: 'Enter title',
+              hintStyle: CustomTheme.buildTextStyle(size: 25),
               contentPadding: EdgeInsets.zero,
             ),
             onSaved: (value) {
@@ -246,6 +243,7 @@ class _TaskMutationState extends State<TaskMutation> {
               maxLines: 6,
               decoration: InputDecoration(
                 hintText: 'Add description',
+                hintStyle: CustomTheme.buildTextStyle(),
                 border: InputBorder.none,
                 helperStyle: _buildErrorTextStyle(),
                 errorStyle: _buildErrorTextStyle(),
@@ -299,7 +297,7 @@ class _TaskMutationState extends State<TaskMutation> {
     final DateTime picked = await showDatePicker(
       context: context,
       initialDate: _task.dueDate ?? DateTime.now().add(Duration(days: 1)),
-      firstDate: DateTime.now(),
+      firstDate: _task.creationDate ?? DateTime.now(),
       lastDate: DateTime(2101),
     );
     if (picked != null && picked != _task.dueDate) {
@@ -618,7 +616,7 @@ class _TaskMutationState extends State<TaskMutation> {
             _buildRepeatOption(
               title: 'Every week on ${weekdayMap[_task.dueDate.weekday]}',
               targetRule: RecurrenceRule(Frequency.WEEKLY, 365 * 100, null, 1,
-                  Byday(<Weekday>[Weekday.values[_task.dueDate.weekday]], null)),
+                  Byday(<Weekday>[Weekday.values[_task.dueDate.weekday - 1]], null)),
             ),
             _buildRepeatOption(
               title:
@@ -628,7 +626,7 @@ class _TaskMutationState extends State<TaskMutation> {
                 365 * 100,
                 null,
                 1,
-                Byday(<Weekday>[Weekday.values[_task.dueDate.weekday]],
+                Byday(<Weekday>[Weekday.values[_task.dueDate.weekday - 1]],
                     (_task.dueDate.day - 1) ~/ 7),
               ),
             ),
@@ -693,7 +691,7 @@ class _TaskMutationState extends State<TaskMutation> {
           children: <Widget>[
             Container(
               margin: EdgeInsets.only(right: 16),
-              child: Icon(CustomIcons.target),
+              child: Icon(CustomIcons.hourglass_full),
             ),
             Expanded(
               child: Container(
@@ -856,7 +854,7 @@ class _TaskMutationState extends State<TaskMutation> {
         children: <Widget>[
           Container(
             margin: EdgeInsets.only(right: 16),
-            child: Icon(CustomIcons.target),
+            child: Icon(CustomIcons.hourglass_full),
           ),
           Expanded(
             child: Text(

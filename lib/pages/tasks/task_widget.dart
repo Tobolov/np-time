@@ -64,9 +64,9 @@ class TaskWidget extends StatelessWidget {
         child: _buildTaskWidgetBody(context),
         direction: DismissDirection.endToStart,
         background: _buildTaskDissmissableBackground(
-            'Restore', CustomTheme.green, Icons.restore, MainAxisAlignment.start),
+            'Restore', CustomTheme.greenColor, Icons.restore, MainAxisAlignment.start),
         secondaryBackground: _buildTaskDissmissableBackground(
-            'Restore', CustomTheme.green, Icons.restore, MainAxisAlignment.end),
+            'Restore', CustomTheme.greenColor, Icons.restore, MainAxisAlignment.end),
         onDismissed: (direction) {
           tasksBloc.restore(_task);
         },

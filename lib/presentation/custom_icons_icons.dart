@@ -40,4 +40,5 @@ class CustomIcons {
   static const IconData warning = const IconData(0xe805, fontFamily: _kFontFam);
   static const IconData wrench = const IconData(0xe806, fontFamily: _kFontFam);
   static const IconData target = const IconData(0xe807, fontFamily: _kFontFam);
+  static const IconData hourglass_full = const IconData(0xe808, fontFamily: _kFontFam);
 }

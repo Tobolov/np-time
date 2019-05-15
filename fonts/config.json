@@ -61,6 +61,12 @@
       "search": [
         "target"
       ]
+    },
+    {
+      "uid": "0225785643202c9bddf6feba6fd86687",
+      "css": "hourglass_full",
+      "code": 59400,
+      "src": "material"
     }
   ]
 }

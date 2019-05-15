@@ -55,7 +55,7 @@ class _DialSelectorState extends State<DialSelector> {
 
   Widget _buildContext() {
     return Container(
-      height: 250,
+      height: 225,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: () {
@@ -226,6 +226,6 @@ class _DialSelectorState extends State<DialSelector> {
   }
 
   TextStyle _buildActionTextStyle() {
-    return TextStyle(fontFamily: 'RobotoCondensed', color: CustomTheme.secondaryColor);
+    return CustomTheme.buildTextStyle(color: CustomTheme.secondaryColor);
   }
 }

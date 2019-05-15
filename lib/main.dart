@@ -6,6 +6,7 @@ import 'package:np_time/models/task.dart';
 import 'package:np_time/pages/task_detailer/task_detailer.dart';
 import 'package:np_time/pages/task_mutation/task_mutation.dart';
 import 'package:np_time/pages/task_timer/task_timer.dart';
+import 'package:np_time/theme.dart';
 
 import './pages/home/home.dart';
 import './db/database.dart';
@@ -28,10 +29,15 @@ class MyApp extends StatelessWidget {
       //debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
-        accentColor: const Color(0xFF00838F),
-        primaryColor: const Color(0xFF00838F),
-        backgroundColor: const Color(0xFF00838F),
-        scaffoldBackgroundColor: const Color(0xFF27272F),
+        accentColor: CustomTheme.secondaryColor,
+        primaryColor: CustomTheme.secondaryColor,
+        backgroundColor: CustomTheme.secondaryColor,
+        scaffoldBackgroundColor: CustomTheme.backgroundColor,
+
+        // dialogs
+        dialogBackgroundColor: CustomTheme.primaryColor,
+        cardColor: CustomTheme.primaryColor,
+        canvasColor: CustomTheme.primaryColor,
       ),
       routes: {
         '/': (BuildContext context) => HomeWrapper(),

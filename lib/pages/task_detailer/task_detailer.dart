@@ -63,7 +63,8 @@ class _TaskDetailerState extends State<TaskDetailer> {
           ? FloatingActionButton(
               child: Icon(Icons.timer),
               onPressed: () {
-                displayLogTimeDialog(context, 0, false, _task, onSelected: () => setState(() {}));
+                displayLogTimeDialog(context, 0, false, _task,
+                    onSelected: () => setState(() {}));
               },
             )
           : null,
@@ -277,7 +278,7 @@ class _TaskDetailerState extends State<TaskDetailer> {
         children: <Widget>[
           Container(
             margin: EdgeInsets.only(right: 16),
-            child: Icon(CustomIcons.target),
+            child: Icon(CustomIcons.hourglass_full),
           ),
           Expanded(
             child: Container(
@@ -307,7 +308,7 @@ class _TaskDetailerState extends State<TaskDetailer> {
               margin: EdgeInsets.only(top: 16, left: 16),
               child: Text(
                 'Subtasks',
-                style: CustomTheme.buildTextStyle(color: CustomTheme.textSecondary),
+                style: CustomTheme.buildTextStyle(color: CustomTheme.textPrimary),
               ),
             )
           ];
@@ -338,14 +339,14 @@ class _TaskDetailerState extends State<TaskDetailer> {
               margin: EdgeInsets.only(right: 16),
               child: () {
                 if (_task.subtasks[index].percentComplete == 100) {
-                  return Icon(Icons.done, size: 36);
+                  return Icon(Icons.done, size: 33);
                 } else {
                   return Text(
                     percentCompeleteLabel,
                     style: TextStyle(
                       fontFamily: 'RobotoCondensed',
                       fontWeight: FontWeight.w300,
-                      fontSize: 35,
+                      fontSize: 28,
                       color: CustomTheme.textPrimary,
                     ),
                   );
@@ -378,13 +379,15 @@ class _TaskDetailerState extends State<TaskDetailer> {
                         Container(
                           margin: EdgeInsets.only(right: 16),
                           child:
-                              Icon(CustomIcons.target, color: CustomTheme.textSecondary),
+                              Icon(CustomIcons.hourglass_full, color: CustomTheme.textSecondary),
                         ),
                         Expanded(
                           child: Text(
                             _task.estimatedDurationString(subtaskIndex: index),
                             style: CustomTheme.buildTextStyle(
-                                color: CustomTheme.textSecondary),
+                              color: CustomTheme.textSecondary,
+                              size: 19,
+                            ),
                           ),
                         ),
                       ],
@@ -396,7 +399,8 @@ class _TaskDetailerState extends State<TaskDetailer> {
             IconButton(
               icon: Icon(Icons.timer),
               onPressed: () {
-                displayLogTimeDialog(context, index, true, _task, onSelected: () => setState(() {}));
+                displayLogTimeDialog(context, index, true, _task,
+                    onSelected: () => setState(() {}));
               },
             )
           ],
@@ -408,5 +412,5 @@ class _TaskDetailerState extends State<TaskDetailer> {
 //=======================================================================================
 //                                    Log Time
 //=======================================================================================
-  
+
 }

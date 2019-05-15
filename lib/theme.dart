@@ -10,7 +10,7 @@ class CustomTheme {
   static final Color primaryColor = const Color(0xFF33333D);
   static final Color backgroundColor = const Color(0xFF27272F);
   static final Color errorColor = const Color(0xFFC62828);
-  static final Color green = const Color(0xFF2E7D32);
+  static final Color greenColor = const Color(0xFF2E7D32);
 
   static final double borderRadius = 6;
 

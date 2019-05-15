@@ -140,7 +140,7 @@ class _TaskTimerState extends State<TaskTimer> {
       children: <Widget>[
         Container(
           margin: EdgeInsets.only(right: 16),
-          child: Icon(CustomIcons.target),
+          child: Icon(CustomIcons.hourglass_full),
         ),
         Expanded(
           child: Container(
