@@ -68,8 +68,6 @@ class MyApp extends StatelessWidget {
   
   // todo make notifications work
   // todo make task repeating work
-  // todo add activity log
   // todo add fully customisable repeat dialog
-  // todo fix color pallete
   // todo replace all dividers + text styles with CustomTheme
 }

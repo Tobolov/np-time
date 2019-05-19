@@ -9,6 +9,7 @@ import 'package:np_time/presentation/custom_icons_icons.dart';
 import 'package:np_time/theme.dart';
 import 'package:intl/intl.dart';
 import 'package:np_time/widgets/dial_selector.dart';
+import 'package:np_time/util.dart' as util;
 
 class TaskMutation extends StatefulWidget {
   final Task taskToEdit;
@@ -26,17 +27,6 @@ class _TaskMutationState extends State<TaskMutation> {
   var scaffold = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
   final _titleKey = GlobalKey<FormFieldState>();
-
-  static final weekdayMap = {
-    1: 'Monday',
-    2: 'Tuesday',
-    3: 'Wednesday',
-    4: 'Thursday',
-    5: 'Friday',
-    6: 'Saturday',
-    7: 'Sunday',
-    null: '???',
-  };
 
   @override
   void initState() {
@@ -519,7 +509,7 @@ class _TaskMutationState extends State<TaskMutation> {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 6),
                 child: Text(
-                  _task.rRule != null ? _verbaliseRRule(_task.rRule) : 'Does not repeat',
+                  _task.rRule != null ? _task.verbaliseRRule() : 'Does not repeat',
                   style: CustomTheme.buildTextStyle(),
                 ),
               ),
@@ -529,66 +519,6 @@ class _TaskMutationState extends State<TaskMutation> {
       ),
       onTap: () => _selectRepeat(context),
     );
-  }
-
-  String _verbaliseRRule(RecurrenceRule rRule) {
-    String frequency = {
-      Frequency.DAILY: 'day',
-      Frequency.MONTHLY: 'month',
-      Frequency.WEEKLY: 'week',
-      Frequency.YEARLY: 'year',
-      null: ''
-    }[rRule.getFrequency()];
-
-    String repeatDay = weekdayMap[rRule.getByday()?.getWeekday()?.elementAt(0)?.index];
-
-    switch (rRule.getFrequency()) {
-      case Frequency.WEEKLY:
-        if (rRule.getInterval() == 1) {
-          return 'Repeats every week on $repeatDay';
-        } else {
-          return 'Repeats every ${_stringifyNumber(rRule.getInterval())} week on $repeatDay';
-        }
-        break;
-      case Frequency.MONTHLY:
-        String frequency =
-            rRule.getInterval() == 1 ? '' : _stringifyNumber(rRule.getInterval());
-        if (rRule.getByday() != null) {
-          String weekday = weekdayMap[rRule.getByday().getWeekday()[0].index];
-          String weekdayNth = _stringifyNumber(rRule.getByday().getNth());
-          return 'Repeats every $frequency month on the $weekdayNth $weekday';
-        } else {
-          return 'Repeats every $frequency month on the ${_stringifyNumber(_task.dueDate.day)}';
-        }
-        break;
-
-      default:
-        if (rRule.getInterval() == 1) {
-          return 'Repeats every $frequency';
-        } else {
-          return 'Repeats every ${_stringifyNumber(rRule.getInterval())} $frequency';
-        }
-        break;
-    }
-  }
-
-  String _stringifyNumber(int number) {
-    String postfix;
-    switch (number % 10) {
-      case 1:
-        postfix = 'st';
-        break;
-      case 2:
-        postfix = 'nd';
-        break;
-      case 3:
-        postfix = 'rd';
-        break;
-      default:
-        postfix = 'th';
-        break;
-    }
-    return '$number$postfix';
   }
 
   Future<void> _selectRepeat(BuildContext context) async {
@@ -614,13 +544,13 @@ class _TaskMutationState extends State<TaskMutation> {
               targetRule: RecurrenceRule(Frequency.DAILY, 365 * 100, null, 1, null),
             ),
             _buildRepeatOption(
-              title: 'Every week on ${weekdayMap[_task.dueDate.weekday]}',
+              title: 'Every week on ${Task.weekdayMap[_task.dueDate.weekday]}',
               targetRule: RecurrenceRule(Frequency.WEEKLY, 365 * 100, null, 1,
                   Byday(<Weekday>[Weekday.values[_task.dueDate.weekday - 1]], null)),
             ),
             _buildRepeatOption(
               title:
-                  'Every month on the ${_stringifyNumber((_task.dueDate.day - 1) ~/ 7)} ${weekdayMap[_task.dueDate.weekday]}',
+                  'Every month on the ${util.stringifyNumber((_task.dueDate.day - 1) ~/ 7)} ${Task.weekdayMap[_task.dueDate.weekday]}',
               targetRule: RecurrenceRule(
                 Frequency.MONTHLY,
                 365 * 100,
@@ -631,7 +561,7 @@ class _TaskMutationState extends State<TaskMutation> {
               ),
             ),
             _buildRepeatOption(
-              title: 'Every month on the ${_stringifyNumber(_task.dueDate.day)}',
+              title: 'Every month on the ${util.stringifyNumber(_task.dueDate.day)}',
               targetRule: RecurrenceRule(Frequency.MONTHLY, 365 * 100, null, 1, null),
             ),
           ],
@@ -766,7 +696,7 @@ class _TaskMutationState extends State<TaskMutation> {
                   ),
                   Expanded(child: _buildSubtaskCenterContent(index)),
                   InkWell(
-                    borderRadius: BorderRadius.circular(CustomTheme.borderRadius),
+                      borderRadius: BorderRadius.circular(CustomTheme.borderRadius),
                       child: Container(
                         margin: EdgeInsets.symmetric(horizontal: 16),
                         child: Icon(Icons.close),
@@ -826,7 +756,11 @@ class _TaskMutationState extends State<TaskMutation> {
                 _task.subtasks[index].name = value ?? '';
               });
             },
-            validator: (value) => value.isEmpty ? 'Subtask name can\'t be empty' : null,
+            validator: (value) {
+              if (value.isEmpty) return 'Subtask name can\'t be empty';
+              if (value == '__simple__') return 'Subtask name __simple__ can\'t be used';
+              return null;
+            },
           ),
         ),
         _buildSubtaskEstimatedTime(context, index),

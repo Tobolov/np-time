@@ -104,6 +104,7 @@ class _TaskDetailerState extends State<TaskDetailer> {
             _buildDivider(context),
           ];
         }(),
+        _buildRepeatRow(context),
         ...() {
           // show subtask list if not simple
           if (_task.isSimple) {
@@ -265,7 +266,37 @@ class _TaskDetailerState extends State<TaskDetailer> {
     );
   }
 
-  //=======================================================================================
+//=======================================================================================
+//                                    Repeat
+//=======================================================================================
+
+  Widget _buildRepeatRow(BuildContext context) {
+    return InkWell(
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(top: 5, right: 16),
+              child: Icon(Icons.repeat),
+            ),
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 6),
+                child: Text(
+                  _task.rRule != null ? _task.verbaliseRRule() : 'Does not repeat',
+                  style: CustomTheme.buildTextStyle(),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+//=======================================================================================
 //                                  Estimated Time
 //=======================================================================================
   Widget _buildEstimatedTimeRow(BuildContext context) {

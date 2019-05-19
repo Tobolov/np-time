@@ -52,8 +52,18 @@ class TaskWidget extends StatelessWidget {
           if (direction == DismissDirection.startToEnd) {
             tasksBloc.delete(_task);
 
-            //todo replace with undo
-            Scaffold.of(context).showSnackBar(SnackBar(content: Text("item dismissed")));
+            // undo archive snackbar
+            Scaffold.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Task archived"),
+                action: SnackBarAction(
+                  label: 'UNDO',
+                  onPressed: () {
+                    tasksBloc.restore(_task);
+                  },
+                ),
+              ),
+            );
           }
         },
       );
@@ -69,6 +79,18 @@ class TaskWidget extends StatelessWidget {
             'Restore', CustomTheme.greenColor, Icons.restore, MainAxisAlignment.end),
         onDismissed: (direction) {
           tasksBloc.restore(_task);
+
+          Scaffold.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Task restored"),
+                action: SnackBarAction(
+                  label: 'UNDO',
+                  onPressed: () {
+                    tasksBloc.delete(_task);
+                  },
+                ),
+              ),
+            );
         },
       );
     }
@@ -195,7 +217,7 @@ class TaskWidget extends StatelessWidget {
 
     // task is overdue
     if (_task.dueDate.compareTo(DateTime.now()) < 0) {
-      int daysOverdue = _task.dueDate.difference(DateTime.now()).inDays;
+      int daysOverdue = -1 * _task.dueDateDaysRemaining();
       String overdueString;
       if (daysOverdue == 1) {
         overdueString = '1 day';

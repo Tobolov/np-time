@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:grec_minimal/grec_minimal.dart';
 import 'package:intl/intl.dart';
 import 'package:np_time/models/logged_time.dart';
+import 'package:np_time/util.dart' as util;
 
 import './subtask.dart';
 
@@ -24,6 +25,18 @@ class Task {
   RecurrenceRule rRule;
   List<Duration> notification;
   List<Subtask> subtasks;
+
+  // used to verbalise rrule
+  static final weekdayMap = {
+    1: 'Monday',
+    2: 'Tuesday',
+    3: 'Wednesday',
+    4: 'Thursday',
+    5: 'Friday',
+    6: 'Saturday',
+    7: 'Sunday',
+    null: '???',
+  };
 
   Duration get estimatedDuration => _calculateEstimatedDuration();
   String get dueDateString => _dueDateString();
@@ -128,12 +141,13 @@ class Task {
 
   String _dueDateString() {
     //todo make this a bit better. make util function.
-    int daysRemaining = dueDate.difference(DateTime.now()).inDays;
+    int daysRemaining = dueDateDaysRemaining();
     if (daysRemaining == -1) {
       return 'Due yesterday';
     } else if (daysRemaining < -1) {
       return 'Due ${-1 * daysRemaining} days ago';
-    } if (daysRemaining == 0) {
+    }
+    if (daysRemaining == 0) {
       return 'Due today';
     } else if (daysRemaining == 1) {
       return 'Due tommorow';
@@ -142,8 +156,15 @@ class Task {
     }
   }
 
+  int dueDateDaysRemaining() {
+    return _truncateDateTime(dueDate)
+        .difference(_truncateDateTime(DateTime.now()))
+        .inDays;
+  }
+
   String _dateDeletedString() {
-    int daysAgo = -1 * dueDate.difference(DateTime.now()).inDays;
+    int daysAgo = -1 *
+        _truncateDateTime(dueDate).difference(_truncateDateTime(DateTime.now())).inDays;
     if (daysAgo == 0) {
       return 'Deleted today';
     } else if (daysAgo == 1) {
@@ -220,10 +241,51 @@ class Task {
         if (loggedTime.date.year == date.year &&
             loggedTime.date.month == date.month &&
             loggedTime.date.day == date.day) {
-              totalSeconds += loggedTime.timespan.inSeconds;
-            }
+          totalSeconds += loggedTime.timespan.inSeconds;
+        }
       }
     }
     return Duration(seconds: totalSeconds);
+  }
+
+  String verbaliseRRule() {
+    String frequency = {
+      Frequency.DAILY: 'day',
+      Frequency.MONTHLY: 'month',
+      Frequency.WEEKLY: 'week',
+      Frequency.YEARLY: 'year',
+      null: ''
+    }[rRule.getFrequency()];
+
+    String repeatDay = weekdayMap[rRule.getByday()?.getWeekday()?.elementAt(0)?.index];
+
+    switch (rRule.getFrequency()) {
+      case Frequency.WEEKLY:
+        if (rRule.getInterval() == 1) {
+          return 'Repeats every week on $repeatDay';
+        } else {
+          return 'Repeats every ${util.stringifyNumber(rRule.getInterval())} week on $repeatDay';
+        }
+        break;
+      case Frequency.MONTHLY:
+        String frequency =
+            rRule.getInterval() == 1 ? '' : util.stringifyNumber(rRule.getInterval());
+        if (rRule.getByday() != null) {
+          String weekday = weekdayMap[rRule.getByday().getWeekday()[0].index];
+          String weekdayNth = util.stringifyNumber(rRule.getByday().getNth());
+          return 'Repeats every $frequency month on the $weekdayNth $weekday';
+        } else {
+          return 'Repeats every $frequency month on the ${util.stringifyNumber(dueDate.day)}';
+        }
+        break;
+
+      default:
+        if (rRule.getInterval() == 1) {
+          return 'Repeats every $frequency';
+        } else {
+          return 'Repeats every ${util.stringifyNumber(rRule.getInterval())} $frequency';
+        }
+        break;
+    }
   }
 }
