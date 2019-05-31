@@ -164,7 +164,7 @@ class Task {
 
   String _dateDeletedString() {
     int daysAgo = -1 *
-        _truncateDateTime(dueDate).difference(_truncateDateTime(DateTime.now())).inDays;
+        _truncateDateTime(deleted).difference(_truncateDateTime(DateTime.now())).inDays;
     if (daysAgo == 0) {
       return 'Deleted today';
     } else if (daysAgo == 1) {
